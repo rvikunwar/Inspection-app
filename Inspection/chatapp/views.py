@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from accounts.models import Profile
 from django.contrib.auth import get_user_model
-
+from .models import MemberMessages
+from .serializer import MessengerMessageSerializer
 User = get_user_model()
 
 
@@ -24,4 +25,10 @@ def AddProfileToMessenger(sender, receiver):
         new_receiver = User.objects.get(id=receiver)
         sender_profile.messenger_list.add(new_receiver)
         receiver_profile.messenger_list.add(new_sender)
+
+
+def getMessengerData(currentUser, selectedUser):
+    message = MemberMessages.objects.filter(sender=currentUser, receiver=selectedUser).order_by('timestamp').first()
+    serializer = MessengerMessageSerializer(message)
+    print(serializer.data)
 

@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-7oewxdibnf^l3@&&8k&7ytu*vayh)x18ew8#nme434tnzvh&2n
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.43.176', '127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -36,9 +36,9 @@ INSTALLED_APPS = [
 
     "corsheaders",
     'accounts.apps.AccountsConfig',
-    'djoser',
     'channels',
     'chatapp',
+    'Notifications',
     'Inspectionapp',
     'rest_framework',
     'django.contrib.admin',
@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'mapwidgets'
 ]
 
 
@@ -168,3 +167,4 @@ CHANNEL_LAYERS = {
 CORS_ALLOWED_ORIGINS = [
     'http://192.168.43.176:19000'
 ]
+

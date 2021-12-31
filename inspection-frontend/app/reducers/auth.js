@@ -8,19 +8,20 @@ const initialState = {
     },
     user: {
         lang: "en",
-        username: null,
-        email: null,
-        active_on_service: null,
-        entity: null,
-        first_name: null,
-        last_name: null,
-        profile_id: null,
-        manager_contact: null,
-        phone_number: null,
-        position: null,
-        user_id: null,
-        profile_image: null,
-        unseen_messages:null
+        username: "ss",
+        email: "sss",
+        active_on_service: true,
+        entity: -1,
+        first_name:"ss",
+        last_name: "ss",
+        profile_id: -1,
+        manager_contact: 222,
+        phone_number: 222,
+        position: "ss",
+        user_id: 111,
+        profile_image: "s",
+        unseen_messages: -1,
+        messenger_list:[]
     },
 };
 
@@ -43,7 +44,6 @@ export default (state = initialState, { type, payload } = action) => {
                 return {
                     ...state,
                     user: {
-                        user_id: payload.user,
                         email: payload.email,
                         entity: payload.entity,
                         first_name: payload.first_name,
@@ -54,7 +54,8 @@ export default (state = initialState, { type, payload } = action) => {
                         position: payload.position,
                         user_id: payload.user,
                         profile_image: payload.profile_image,
-                        unseen_messages: payload.un_seen_messages  
+                        unseen_messages: payload.un_seen_messages,
+                        messenger_list: payload.messenger_list 
                     }
                 }
 
@@ -69,8 +70,13 @@ export default (state = initialState, { type, payload } = action) => {
 
             case actionTypes.LOGOUT:
                 return {
-                    ...initialState
-            }
+                    ...state,
+                    login: {
+                        isAuthenticated: false,
+                        token_access: null,
+                        token_refresh: null
+                    },
+                }
 
             default:
                 return state;

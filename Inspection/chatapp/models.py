@@ -8,7 +8,8 @@ User = get_user_model()
 class MemberMessages(models.Model):
     sender = models.ForeignKey(User, related_name="message_author",
                                on_delete=models.SET_NULL, null=True)
-    receiver = models.IntegerField()
+    receiver = models.ForeignKey(User, related_name="message_reciever",
+                               on_delete=models.SET_NULL, null=True)
     content = models.TextField()
     room_name = models.CharField(max_length=500)
     timestamp = models.DateTimeField(default=timezone.now)

@@ -8,6 +8,9 @@ import Task from "@screens/Manager/Task";
 import InsTask from "@screens/Inspector/Task";
 import EntityView from '@screens/Manager/EntityView'
 import Entity from "@screens/Inspector/Entity";
+import Notifications from '@screens/Notifications'
+import { getNotificationCount, getUnseenMessages } from '@selectors' 
+import { NotificationActions } from "@actions";
 
 
 /**
@@ -30,7 +33,7 @@ export const ManagerTabScreens = {
         options: {
             title: "Messenger",
             headerShown:false,
-            tabBarIcon: ({ color }) =>  tabBarIconHaveNoty({ color, name: "facebook-messenger" }),
+            tabBarIcon: ({ color }) =>  tabBarIconHaveNoty({countFunc: getUnseenMessages, color, name: "facebook-messenger" }),
         },
     },
 
@@ -41,6 +44,21 @@ export const ManagerTabScreens = {
             title: "Tasks",
             headerShown:false,
             tabBarIcon: ({ color }) => tabBarIcon({ color, name: "tasks" }),
+        },   
+    },
+
+    Notifications: {
+        component:Notifications,
+        countFunc: getNotificationCount,
+        dispatchFunction: () => {
+            const { countNotification } = NotificationActions;
+            return countNotification({ count: 0 })
+        },
+        options: {
+            title: "Notifications",
+            headerShown:false,
+            tabBarIcon: ({ color }) =>  {                
+                return tabBarIconHaveNoty({ countFunc: getNotificationCount, color, name: "facebook-messenger" })},
         },   
     },
 
@@ -74,7 +92,7 @@ export const InspectorTabScreens = {
         options: {
             title: "Messenger",
             headerShown:false,
-            tabBarIcon: ({ color }) =>  tabBarIconHaveNoty({ color, name: "facebook-messenger" }),
+            tabBarIcon: ({ color }) =>  tabBarIconHaveNoty({countFunc: getUnseenMessages, color, name: "facebook-messenger" }),
         },
     },
     
@@ -85,6 +103,22 @@ export const InspectorTabScreens = {
             headerShown:false,
             tabBarIcon: ({ color }) => tabBarIcon({ color, name: "tasks" }),
         },   
+    },
+
+    Notifications: {
+        component:Notifications,
+        countFunc: getNotificationCount,
+        dispatchFunction: () => {
+            const { countNotification } = NotificationActions;
+            return countNotification({ count: 0 })
+        },
+        options: {
+            title: "Notifications",
+            headerShown:false,
+            countFunc: getNotificationCount,
+            tabBarIcon: ({ color }) =>  {              
+                return tabBarIconHaveNoty({ countFunc: getNotificationCount, color, name: "facebook-messenger" })},
+            },   
     },
 
     Profile: {

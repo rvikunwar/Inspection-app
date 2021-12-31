@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { HOST_URL } from "@env";
 import { store } from 'app/store'
+import { AuthActions } from "@actions";
 
-
+const { Logout } = AuthActions;
 
 export const BASE_URL = HOST_URL
 
@@ -36,6 +37,18 @@ UserAxios.interceptors.request.use( (config) => {
 );
 
 
+UserAxios.interceptors.response.use((response) => {
+    return response;
+}, (error) => {
+    if (error.response && error.response.data) {
+        if(error.response.data.code === 'token_not_valid'){
+            store.dispatch(Logout())
+        }
+    }
+    return Promise.reject(error.message);
+});
+
+
 
 
 const requests = {
@@ -48,7 +61,7 @@ const requests = {
 
 // THis will contain all the endpoints of the resources
 export const endPoints = {
-    login: 'auth/jwt/create/',
+    login: 'token/',
     profileslist: 'accounts/usersprofilelist/',
     userDetails: 'accounts/profiledetails/',
     taskAssignedv1: 'inspectionapp/tasksassigned/',
@@ -69,6 +82,7 @@ export const endPoints = {
     managerprofile: 'accounts/managerprofile/',
     updatestatus:'inspectionapp/updatestatus/',
     updatetodostatus: 'inspectionapp/updatetodostatus/',
+    getUserDetails: 'accounts/usersdetails/'
 }
 
 
@@ -181,6 +195,11 @@ export const InspectionAPI = {
     //update todo status
     updateTodoStatus: ({status, id}) => UserAxios.get(`${BASE_URL}/${endPoints.updatetodostatus}`,{
         params:{status,id}
+    }).then(responseBody),
+
+    //for getting user profile url and name
+    getUserProfileDetails: (id) => UserAxios.get(`${BASE_URL}/${endPoints.getUserDetails}`,{
+        params:{id}
     }).then(responseBody),
 
 }

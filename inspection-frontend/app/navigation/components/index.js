@@ -4,43 +4,42 @@ import { View } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useTranslation } from "react-i18next";
 import { BaseColor, BaseStyle, useTheme } from "@config";
-import { useSelector } from "react-redux";
-
+import { useSelector, useDispatch } from "react-redux";
+import { GlobalWebSocketInstance } from "../../socket/NotificationSocket";
 
 export const tabBarIcon = ({ color, name }) => (
     <Icon name={name} size={20} solid color={color} />
 );
 
-export const tabBarIconHaveNoty = ({ color, name }) => {
-    const unseen_messages = useSelector(state => state.auth?.user?.unseen_messages)
-    
-    const { colors } = useTheme();
-    return (
+export const tabBarIconHaveNoty = ({ countFunc, color, name }) => {
 
-    <View>
-        {tabBarIcon({ color, name })}
-        { unseen_messages>0 &&<View
-            style={{
-                borderWidth: 1,
-                borderColor: BaseColor.whiteColor,
-                justifyContent: "center",
-                alignItems: "center",
-                position: "absolute",
-                width: 20,
-                height: 20,
-                backgroundColor:'#5DADE2',
-                zIndex:100,
-                top: -5,
-                right: -12,
-                borderRadius: 10,
-            }}
-        >
-            <Text whiteColor caption2>
-                {unseen_messages}
-            </Text>
+    const count = useSelector(countFunc)
+    
+    return (
+        <View>
+            {tabBarIcon({ color, name })}
+            { count>0 &&<View
+                style={{
+                    borderWidth: 1,
+                    borderColor: BaseColor.whiteColor,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    position: "absolute",
+                    width: 20,
+                    height: 20,
+                    backgroundColor:'#5DADE2',
+                    zIndex:100,
+                    top: -5,
+                    right: -12,
+                    borderRadius: 10,
+                }}
+            >
+                <Text whiteColor caption2>
+                    {count}
+                </Text>
+            </View>
+        }
         </View>
-    }
-    </View>
 )};
 
 const BottomTab = createBottomTabNavigator();
@@ -50,6 +49,8 @@ export const BottomTabNavigator = ({
 }) => {
     const { t } = useTranslation();
     const { colors } = useTheme();
+    const dispatch = useDispatch();
+
 
     return (
         <BottomTab.Navigator
@@ -65,12 +66,26 @@ export const BottomTabNavigator = ({
             }}
         >
             {Object.keys(tabScreens).map((name, index) => {
-                const { options, component } = tabScreens[name];
+                const { countFunc, dispatchFunction, options, component } = tabScreens[name];
+                let count = 0;
+                if(typeof countFunc === 'function'){
+                    count = useSelector(countFunc)
+                }
+
+
                 return (
                     <BottomTab.Screen
                         key={index}
                         name={name}
                         component={component}
+                        listeners={() => ({
+                            tabPress: e => {
+                                if(typeof dispatchFunction === 'function' && count>0){
+                                    dispatch(dispatchFunction())
+                                    GlobalWebSocketInstance.updateNotificationSeenStatus()
+                                }
+                            },
+                          })}
                         options={{
                             ...options,
                             title: t(options.title),

@@ -3,7 +3,7 @@ from asgiref.sync import async_to_sync
 import json
 from django.contrib.auth import get_user_model
 from .serializer import *
-from .views import AddProfileToMessenger
+from .views import AddProfileToMessenger, getMessengerData
 User = get_user_model()
 from accounts.models import Profile
 
@@ -67,11 +67,22 @@ class ChatConsumer(WebsocketConsumer):
         }
         return self.send_online_status(content)
 
+    def mesenger_list(self, data):
+        currentUser = data['currentUser']
+        selectedUser = data['selectedUser']
+        messenger_data = getMessengerData(currentUser, selectedUser)
+
+        # content = {
+        #     'command': 'messenger_list',
+        #     'data': messenger_data,
+        # }
+        # return self.send_messenger_data(content)
+
     commands = {
         'fetch_messages': fetch_message,
         'new_message': new_message,
-        'online_status': online_user
-
+        'online_status': online_user,
+        'mesenger_list': mesenger_list
     }
 
     def connect(self):

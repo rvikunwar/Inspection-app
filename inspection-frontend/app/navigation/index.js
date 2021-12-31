@@ -17,8 +17,9 @@ import SignIn from "../screens/SignIn";
 import { InspectorMainScreens, CommonMainScreens, MangerMainScreens } from "./main";
 import WebSocketInstance from '../socket/websocket';
 import { OnlineStatusSet } from '../socket/socketfunc'
-import { AuthActions } from "@actions";
+import { AuthActions, NotificationActions } from "@actions";
 import { managerScreen, inspectorScreen } from "./config/project";
+import { GlobalWebSocketInstance } from '../socket/NotificationSocket'
 
 
 const MainScreens = () => {
@@ -113,7 +114,6 @@ const MainScreens = () => {
     );
 };
 
-// NEW , PROCESSING , RE-ASSIGN , CLOSED
 
 
 const Navigation = () => {
@@ -128,6 +128,7 @@ const Navigation = () => {
     const currentUser = useSelector((state)=> state.auth.user.user_id)
 
     const { setUnseenMessages } = AuthActions;
+    const { countNotification } = NotificationActions
 
     useEffect(() => {
         //Config status bar
@@ -163,12 +164,7 @@ const Navigation = () => {
     }, []);
 
 
-    const goToApp = (name) => {
-        navigationRef?.current?.navigate(name);
-    };
-
-
-    function waitForSocketConnection(callback) {
+    function waitForSocketConnection(WebSocketInstance, callback) {
         setTimeout(function () {
             if (WebSocketInstance.state() === 1) {
             console.log('Connection is made');
@@ -185,13 +181,14 @@ const Navigation = () => {
 
 
     function  UserSettings() {
-        waitForSocketConnection(() => {
+        waitForSocketConnection(WebSocketInstance,() => {
           WebSocketInstance.onlineStatus({user:currentUser,status:true}); 
           
         });
-        WebSocketInstance.connect(currentUser);
+        WebSocketInstance.connect(currentUser, 'chat');
     }
 
+    
     const UserDetails = (m) => {
         dispatch(setUnseenMessages(m.un_seen_messages))
     }
@@ -203,6 +200,8 @@ const Navigation = () => {
         if (isMounted && isAuthenticated===true) {
             UserSettings();
             WebSocketInstance.addCallbacks({ UserDetails })
+        } else {
+            WebSocketInstance.disconnect()
         }
 
         return () => {
@@ -211,6 +210,37 @@ const Navigation = () => {
           
     },[isAuthenticated])
 
+
+    /**
+     * @description function for getting unseen notifications 
+     *  and geting global socket connection
+     */
+    function GlobalUserSettings() {
+        waitForSocketConnection(GlobalWebSocketInstance,() => {
+            GlobalWebSocketInstance.countNotification();           
+        });
+        GlobalWebSocketInstance.connect('global_setup_room');
+    }
+
+    const setNotificationCount = (m) => {
+        dispatch(countNotification({ count: m }))
+    }
+    
+    useEffect(()=>{
+        let isMounted = true;
+
+        if (isMounted && isAuthenticated===true) {
+            GlobalUserSettings();
+            GlobalWebSocketInstance.addCallbacks({ setNotificationCount  })
+        } else {
+            GlobalWebSocketInstance.disconnect()
+        }
+
+        return () => {
+            isMounted = false
+          }
+          
+    },[isAuthenticated])
 
 
     const appState = useRef(AppState.currentState);
@@ -247,8 +277,6 @@ const Navigation = () => {
         };
       }, [isAuthenticated]);
 
-      const user = useSelector((state)=> state?.auth?.user)
-      const position = user.position 
 
     if (loading) {
         return null;
@@ -286,7 +314,7 @@ const Navigation = () => {
                             presentation="card"
                         >
 
-                        {isAuthenticated && position?
+                        {isAuthenticated === true?
                             
                             <RootStack.Screen
                                 name="MainScreens"
