@@ -155,7 +155,7 @@ export const DefaultTheme = {
  * Define list font use for whole application
  */
 
- export const FontSupport = ["ProximaNova", "Raleway", "Roboto", "Merriweather"];
+ export const FontSupport = ["ProximaNova", "Raleway", "Roboto", "Merriweather", "Droidkufi"];
 
 /**
  * Define font default use for whole application

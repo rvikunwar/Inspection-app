@@ -8,10 +8,9 @@ export const countNotification = (payload) => dispatch => {
     });
 }
 
-
-export const newNotification = (payload) => dispatch => {
+export const countMessages = (payload) => dispatch => {
     dispatch({
-        type: actionTypes.NEW_NOTIFICATION,
+        type: actionTypes.MESSAGES_COUNT,
         payload:payload
     });
 }

@@ -41,7 +41,7 @@ export class WebSocketNotificationService {
 
             this.socketRef.onclose = () => {
                 console.log("WebSocket notification service closed let's reopen");
-                this.connect();
+                this.connect(room_name);
             };
         }
 
@@ -54,24 +54,26 @@ export class WebSocketNotificationService {
 
     socketNewMessage(data) {
         const parsedData = JSON.parse(data);
-        console.log(parsedData," socket new")
+        console.log(parsedData)
+
         const command = parsedData.command;
+        
         if (Object.keys(this.callbacks).length === 0) {
             return;
         }
-        if (command === "fetch_notifications") {
-            this.callbacks[command](parsedData.notifications);
+
+        if(command === "new_notification"){
+            this.callbacks[command](parsedData.notification);
         }
 
-        else if(command === "count_notifications") {
-            this.callbacks[command](parsedData.unseen_notifications);
+        if(command === "new_message"){
+            console.log('sshshh')
         }
-    }
 
-    fetchNotification() {
-        this.sendMessage({
-            command: "fetch_notifications",
-        })
+        if(command === "get_message_notification_count"){
+            this.callbacks[command](parsedData);
+        }
+
     }
 
     newNotification(data) {
@@ -81,28 +83,65 @@ export class WebSocketNotificationService {
         })
     }
 
-    countNotification(){
-        this.sendMessage({
-            command: "count_notifications",
-        })
-    }
-
     updateNotificationSeenStatus() {
         this.sendMessage({
             command: "update_notification_seen_status",
         })
     }
+
+    updateMessageSeenStatus(data) {
+        this.sendMessage({
+            command: "update_message_seen_status",
+            sender: data
+        })
+    }
     
+    updateMessageCountToZero() {
+        this.sendMessage({
+            command: "set_messages_count_to_zero",
+        })
+    }
 
-    addCallbacks({ setNotificationsfunc, setNotificationCount }) {
+    updateNotificationCountToZero() {
+        this.sendMessage({
+            command: "update_notification_count_to_zero",
+        })
+    }
 
-        if(typeof setNotificationsfunc === "function"){
-            this.callbacks["fetch_notifications"] = setNotificationsfunc;
+    setOnlineStatus(status) {
+        this.sendMessage({
+            command: "set_online_status",
+            status
+        })
+    }
+ 
+    getMessageNotificationCount() {
+        this.sendMessage({
+            command: "get_message_notification_count",
+        })
+    }
+
+    updateCoordinates(data) {
+        this.sendMessage({
+            command: "update_coordinates",
+            data
+        })
+    }
+
+    updateMessagesCountToZero(){
+        this.sendMessage({
+            command: "set_messages_count_to_zero",
+        })
+    }
+    
+    addCallbacks({ setNewNotification, setMessageANDNotificationCount }) {
+
+        if(typeof setNewNotification === "function"){
+            this.callbacks["new_notification"] = setNewNotification;
         }
-
-        else if(typeof setNotificationCount === "function"){
-            this.callbacks["count_notifications"] = setNotificationCount;
-
+        
+        if(typeof setMessageANDNotificationCount === "function"){
+            this.callbacks["get_message_notification_count"] = setMessageANDNotificationCount;
         }
 
     }

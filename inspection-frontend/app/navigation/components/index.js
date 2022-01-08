@@ -3,9 +3,8 @@ import { Icon, Text } from "@components";
 import { View } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useTranslation } from "react-i18next";
-import { BaseColor, BaseStyle, useTheme } from "@config";
-import { useSelector, useDispatch } from "react-redux";
-import { GlobalWebSocketInstance } from "../../socket/NotificationSocket";
+import { BaseColor, useTheme } from "@config";
+import { useSelector } from "react-redux";
 
 export const tabBarIcon = ({ color, name }) => (
     <Icon name={name} size={20} solid color={color} />
@@ -49,7 +48,6 @@ export const BottomTabNavigator = ({
 }) => {
     const { t } = useTranslation();
     const { colors } = useTheme();
-    const dispatch = useDispatch();
 
 
     return (
@@ -66,26 +64,13 @@ export const BottomTabNavigator = ({
             }}
         >
             {Object.keys(tabScreens).map((name, index) => {
-                const { countFunc, dispatchFunction, options, component } = tabScreens[name];
-                let count = 0;
-                if(typeof countFunc === 'function'){
-                    count = useSelector(countFunc)
-                }
-
+                const { options, component } = tabScreens[name];
 
                 return (
                     <BottomTab.Screen
                         key={index}
                         name={name}
                         component={component}
-                        listeners={() => ({
-                            tabPress: e => {
-                                if(typeof dispatchFunction === 'function' && count>0){
-                                    dispatch(dispatchFunction())
-                                    GlobalWebSocketInstance.updateNotificationSeenStatus()
-                                }
-                            },
-                          })}
                         options={{
                             ...options,
                             title: t(options.title),

@@ -77,7 +77,7 @@ export default function ProfilePerformance(props) {
               );
             } else if (index == data.length - 1) {
               return (
-                <View style={[styles.contentRight, contentRight]} key={index}>
+                <View style={[styles.contentCenter, contentCenter]} key={index}>
                   {renderValue(type, item.value)}
                   {renderTitle(type, item.title)}
                 </View>

@@ -10,7 +10,6 @@ import EntityView from '@screens/Manager/EntityView'
 import Entity from "@screens/Inspector/Entity";
 import Notifications from '@screens/Notifications'
 import { getNotificationCount, getUnseenMessages } from '@selectors' 
-import { NotificationActions } from "@actions";
 
 
 /**
@@ -49,11 +48,6 @@ export const ManagerTabScreens = {
 
     Notifications: {
         component:Notifications,
-        countFunc: getNotificationCount,
-        dispatchFunction: () => {
-            const { countNotification } = NotificationActions;
-            return countNotification({ count: 0 })
-        },
         options: {
             title: "Notifications",
             headerShown:false,
@@ -107,17 +101,11 @@ export const InspectorTabScreens = {
 
     Notifications: {
         component:Notifications,
-        countFunc: getNotificationCount,
-        dispatchFunction: () => {
-            const { countNotification } = NotificationActions;
-            return countNotification({ count: 0 })
-        },
         options: {
             title: "Notifications",
             headerShown:false,
-            countFunc: getNotificationCount,
             tabBarIcon: ({ color }) =>  {              
-                return tabBarIconHaveNoty({ countFunc: getNotificationCount, color, name: "facebook-messenger" })},
+                return tabBarIconHaveNoty({ countFunc: getNotificationCount, color, name: "bell" })},
             },   
     },
 

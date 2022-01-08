@@ -23,6 +23,7 @@ import styles from "./styles";
 import { InspectionAPI } from "@connect/api";
 import { backendDateFormat } from '@common'
 import ChooseFile from "./ChooseFile";
+import {  sendNotificationHandler } from '../../../socket/socketfunc'
 
 
 const TaskCreate = (props) => {
@@ -32,6 +33,11 @@ const TaskCreate = (props) => {
     const [headerName, setHeaderName] = useState(t("Create task"));
     const navigation = useNavigation();
     const route = useRoute();
+    const profile = route?.params?.profile
+    const department = route?.params?.department
+    const area = route?.params?.area
+
+
 
     const TaskPriority = [
         {
@@ -45,9 +51,9 @@ const TaskCreate = (props) => {
             text: "High",
         },
         {
-            value: "MEDUIM",
+            value: "MEDIUM",
             iconName: "minus-circle",
-            text: "Meduim",
+            text: "Medium",
         },
         {
             value: "LOW",
@@ -59,17 +65,32 @@ const TaskCreate = (props) => {
     const [ priority, setPriority ] = useState(TaskPriority[0])
     const [ openPriority, setOpenPriority ] = useState(false)
 
+
+    //for handling notification and sending to user
+    const notifictaionHandler = (title) => {
+        sendNotificationHandler({
+            title:"New assignment",
+            title1:title,
+            sender_name: profile?.first_name + " " + profile?.last_name,
+            reciever: profile?.user,
+            content: `has assigned you a new task for ${department?.name} for ${area?.name}`,
+        })
+    }
+
+
     const defaultValues = {
         id: null,
         title: null,
         description: null,
         priority: priority.value,
-        assigned_to:null,
-        entity:null,
+        assigned_to:profile.user,
+        entity:department.id,
         end_date: backendDateFormat(new Date),
     }
 
+
     const [ formdata, setFormdata ] = useState(defaultValues)
+
 
     useEffect(() => {
         if (route?.params?.item) {
@@ -83,27 +104,24 @@ const TaskCreate = (props) => {
         }
     }, [route?.params?.item]);
 
+
     /**
      * @description for assigning entity id and assign to
      */
     useEffect(() => {
-        if (route?.params?.profile) {
-            const profile = route?.params?.profile;
-            setFormdata({
-                ...formdata,
-                assigned_to:profile.user,
-                enity:profile.entity
-            })
-
+        if (profile) {
             setHeaderName(t("Create task"));
         }
-    }, [route?.params?.profile]);
+    }, [profile]);
 
 
     //FOR UPDATING AND POSTING TASK
     const submitFormHandler = () => {
-
+        if(formdata.title){
+            notifictaionHandler(formdata.title)
+        }
         InspectionAPI.postTask(formdata).then((res)=>{
+
             if(fileList.length>0){
                 uploadFiles(res.id,()=>{
                     setFormdata(defaultValues)
@@ -127,10 +145,11 @@ const TaskCreate = (props) => {
         }).catch((err)=>{
             console.log(err)
         })
-    
     }
+
     
     const [ fileList, setFileList ] = useState([])
+
 
     const uploadFiles = (task, callback) => {
         
@@ -153,7 +172,7 @@ const TaskCreate = (props) => {
         title: "",
         description: ""
     }
-    const [ todo, setTodo ] = useState([defaultTodo])
+    const [ todo, setTodo ] = useState([])
 
     const addNewRow = () => {
         setTodo([

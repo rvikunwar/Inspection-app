@@ -1,11 +1,11 @@
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
 import json
-from django.contrib.auth import get_user_model
-from .serializer import *
-from .views import AddProfileToMessenger, getMessengerData
+from chatapp.restApi.serializer import *
 User = get_user_model()
 from accounts.models import Profile
+from .restApi.serializer import MessageSerializer
+from Notifications.utils import send_push_message
 
 
 class ChatConsumer(WebsocketConsumer):
@@ -22,67 +22,43 @@ class ChatConsumer(WebsocketConsumer):
         }
         self.send_message(content)
 
-    def message_to_json(self, message):
-        return {
-            'sender': message.sender.id,
-            'receiver': message.receiver,
-            'content': message.content,
-            'timestamp': str(message.timestamp)
-        }
-
     def new_message(self, data):
         sender = data['sender']
-        receiver = data['receiver']
-        AddProfileToMessenger(sender, receiver)
-        receiver_profile = Profile.objects.get(user=receiver)
-        status = receiver_profile.online
+        reciever = data['receiver']
+        try:
+            sender = User.objects.get(id=sender)
+            reciever = User.objects.get(id=reciever)
+            message = MemberMessages.objects.create(sender=sender, reciever=reciever,
+                                                    content=data['content'])
+            message.save()
+            profile = Profile.objects.filter(user=reciever).first()
+            profile.un_seen_messages = profile.un_seen_messages + 1
+            profile.save()
+            serializer = MessageSerializer(message)
+        except Exception as e:
+            print(e)
+            raise e
 
-        if status == False:
-            count = receiver_profile.un_seen_messages
-            receiver_profile.un_seen_messages = count+1
-            receiver_profile.save()
+        try:
+            message = serializer.data['content']
+            profile = Profile.objects.get(user=reciever.id)
+            tokens = profile.expo_token.all()
+            message = message
+            title = f'New message from {profile.first_name} {profile.last_name}'
+            for tk in tokens:
+                send_push_message(str(tk), title, message)
+        except Exception as e:
+            print(e)
 
-        room_name = self.scope['url_route']['kwargs']['room_name']
-        sender = User.objects.get(id=sender)
-        message = MemberMessages.objects.create(sender=sender, receiver=receiver,
-                                                content=data['content'], room_name=room_name)
         content = {
             'command': 'new_message',
-            'message': self.message_to_json(message)
+            'message': serializer.data
         }
         return self.send_chat_message(content)
-
-    def online_user(self, data):
-        user = data['user']
-        status = data['status']
-
-        profile = Profile.objects.get(user=user)
-        profile.online = status
-        profile.save()
-        un_seen_messages = profile.un_seen_messages
-        content = {
-            'command': 'online_status',
-            'online': status,
-            'un_seen_messages': un_seen_messages
-        }
-        return self.send_online_status(content)
-
-    def mesenger_list(self, data):
-        currentUser = data['currentUser']
-        selectedUser = data['selectedUser']
-        messenger_data = getMessengerData(currentUser, selectedUser)
-
-        # content = {
-        #     'command': 'messenger_list',
-        #     'data': messenger_data,
-        # }
-        # return self.send_messenger_data(content)
 
     commands = {
         'fetch_messages': fetch_message,
         'new_message': new_message,
-        'online_status': online_user,
-        'mesenger_list': mesenger_list
     }
 
     def connect(self):

@@ -5,3 +5,5 @@ from django.contrib import admin
 
 admin.site.register(Profile)
 admin.site.register(Inspector)
+admin.site.register(ExpoToken)
+

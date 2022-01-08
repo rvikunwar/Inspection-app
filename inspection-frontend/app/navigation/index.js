@@ -1,5 +1,5 @@
 import { ApplicationActions } from "@actions";
-import { BaseSetting, useTheme } from "@config";
+import { BaseSetting, useTheme, useFont } from "@config";
 import { NavigationContainer} from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { languageSelect } from "@selectors";
@@ -13,14 +13,20 @@ const RootStack = createStackNavigator();
 const MainStack = createStackNavigator();
 import * as Font from "expo-font";
 import { AppearanceProvider, useColorScheme } from "react-native-appearance";
-import SignIn from "../screens/SignIn";
+import SignIn from "@screens/SignIn";
+import ResetPassword from '@screens/ResetPassword'
 import { InspectorMainScreens, CommonMainScreens, MangerMainScreens } from "./main";
-import WebSocketInstance from '../socket/websocket';
-import { OnlineStatusSet } from '../socket/socketfunc'
-import { AuthActions, NotificationActions } from "@actions";
+import { setOnlineStatus, getMNCount, updateCoordinates } from '@socket/socketfunc'
+import { NotificationActions } from "@actions";
 import { managerScreen, inspectorScreen } from "./config/project";
-import { GlobalWebSocketInstance } from '../socket/NotificationSocket'
+import { GlobalWebSocketInstance } from '@socket/NotificationSocket'
+import { store } from 'app/store'
+import FlashMessage from "react-native-flash-message";
+import { AuthActions } from '@actions'
+import * as Location from 'expo-location';
 
+
+const { notiMsgCount } = AuthActions;
 
 const MainScreens = () => {
 
@@ -127,8 +133,9 @@ const Navigation = () => {
     const isAuthenticated = useSelector((state)=> state.auth.login.isAuthenticated)
     const currentUser = useSelector((state)=> state.auth.user.user_id)
 
-    const { setUnseenMessages } = AuthActions;
     const { countNotification } = NotificationActions
+    const font = useFont();
+
 
     useEffect(() => {
         //Config status bar
@@ -140,6 +147,7 @@ const Navigation = () => {
             true
         );
     }, [isDarkMode]);
+
 
     useEffect(() => {
         I18nManager.forceRTL(true)
@@ -153,6 +161,7 @@ const Navigation = () => {
             dispatch(ApplicationActions.onChangeLanguage(languageCode));
             // Config language for app
             await i18n.use(initReactI18next).init({
+                compatibilityJSON: 'v3',
                 resources: BaseSetting.resourcesLanguage,
                 lng: languageCode,
                 fallbackLng: languageCode,
@@ -164,125 +173,157 @@ const Navigation = () => {
     }, []);
 
 
-    function waitForSocketConnection(WebSocketInstance, callback) {
+    /**
+     * @description function for getting unseen notifications count
+     *  and geting global socket connection 
+     *  and it is used for getting new notifications
+     */
+
+     const [ socketConnection , setSocketConnection ] = useState(false)
+
+     function waitForSocketConnection(WebSocketInstance, callback) {
         setTimeout(function () {
             if (WebSocketInstance.state() === 1) {
-            console.log('Connection is made');
-            if(typeof callback === 'function'){
-                callback();
-            }
-            return;
+                setSocketConnection(true)
+                console.log('Connection is made');
+                console.log(typeof callback )
+                if(typeof callback === 'function'){
+                    console.log('conn')
+                    callback();
+                } return;
             } else {
-            console.log('wait for connection...');
-            waitForSocketConnection(callback);
+                console.log('wait for connection...');
+                waitForSocketConnection(callback);
             }
         }, 2000);
     }
 
-
-    function  UserSettings() {
-        waitForSocketConnection(WebSocketInstance,() => {
-          WebSocketInstance.onlineStatus({user:currentUser,status:true}); 
-          
-        });
-        WebSocketInstance.connect(currentUser, 'chat');
-    }
-
-    
-    const UserDetails = (m) => {
-        dispatch(setUnseenMessages(m.un_seen_messages))
-    }
-
-
-    useEffect(()=>{
-        let isMounted = true;
-
-        if (isMounted && isAuthenticated===true) {
-            UserSettings();
-            WebSocketInstance.addCallbacks({ UserDetails })
-        } else {
-            WebSocketInstance.disconnect()
-        }
-
-        return () => {
-            isMounted = false
-          }
-          
-    },[isAuthenticated])
-
-
-    /**
-     * @description function for getting unseen notifications 
-     *  and geting global socket connection
-     */
     function GlobalUserSettings() {
-        waitForSocketConnection(GlobalWebSocketInstance,() => {
-            GlobalWebSocketInstance.countNotification();           
-        });
-        GlobalWebSocketInstance.connect('global_setup_room');
+        waitForSocketConnection(GlobalWebSocketInstance,() => GlobalWebSocketInstance.getMessageNotificationCount());
+        GlobalWebSocketInstance.connect(currentUser);
     }
 
-    const setNotificationCount = (m) => {
-        dispatch(countNotification({ count: m }))
+    const setNewNotification = () => {
+        let count =  store.getState().auth.user['notfication_count'];
+        dispatch(countNotification({ count: count+ 1 }));
     }
-    
+
+    const setMessageANDNotificationCount = (m) => {
+        console.log(m,"mssm")
+        dispatch(notiMsgCount(m))
+    }
+
     useEffect(()=>{
         let isMounted = true;
 
         if (isMounted && isAuthenticated===true) {
             GlobalUserSettings();
-            GlobalWebSocketInstance.addCallbacks({ setNotificationCount  })
-        } else {
-            GlobalWebSocketInstance.disconnect()
+            GlobalWebSocketInstance.addCallbacks({ setNewNotification, setMessageANDNotificationCount  })
         }
-
         return () => {
             isMounted = false
-          }
-          
+          }          
     },[isAuthenticated])
 
 
+    useEffect(()=>{
+        return () => {
+            if(isAuthenticated){
+                if(GlobalWebSocketInstance.state() === 1 && isAuthenticated){
+                    GlobalWebSocketInstance.disconnect()
+                    setSocketConnection(false)
+                }
+            }
+        }
+    },[])
+
+
+
     const appState = useRef(AppState.currentState);
-    const [appStateVisible, setAppStateVisible] = useState(appState.current);
+    const [ appStateStatus, setAppStateStatus ] = useState(appState.current)
 
     useEffect(() => {
-        const subscription = AppState.addEventListener("change", nextAppState => {
-          if (
-            appState.current.match(/inactive|background/) &&
-            nextAppState === "active"
-          ) {
-            console.log("App has come to the foreground!");
-           
-            if(isAuthenticated===true){
-                OnlineStatusSet({user:currentUser , status:true})
-            }
-            
+         const subscription = AppState.addEventListener("change", nextAppState => {
+         if (appState.current.match(/inactive|background/) && nextAppState === "active"){
+              console.log("App has come to the foreground!" );
+              if(isAuthenticated===true){
+                   setAppStateStatus(nextAppState)
+                   setOnlineStatus(true)
+                   getMNCount()              
+              }
           }
-          else{
-            appState.current = nextAppState;
-            setAppStateVisible(appState.current);
-            console.log("AppState", appState.current);
+        else{
+              appState.current = nextAppState;
+              console.log("AppState", appState.current);
 
-            if(isAuthenticated === true){
-                OnlineStatusSet({user:currentUser , status:false})
-            }
+              if(isAuthenticated === true&& socketConnection){
+                   setOnlineStatus(false)
+                   setAppStateStatus(nextAppState)
+              }
+         }
 
-          }
+         });
+
+         return () => {
+              subscription.remove();
+          };
+    }, [isAuthenticated]);
+
+    const [ coordinates, setCoordinates ] = useState('')
+    useEffect(()=>{
+
+        if(isAuthenticated){
+            (async () => {
+                let { status } = await  Location.requestForegroundPermissionsAsync();
+               if (status !== 'granted') {
+                  console.log('Permission to access location was denied');
+                  return;
+               } else {
+                 console.log('Access granted!!')
+                 
+                 if (status === 'granted') {
+                    await Location.watchPositionAsync({
+                     accuracy:Location.Accuracy.BestForNavigation,
+                     timeInterval:1000,
+                     distanceInterval : 20
+                     }
+                     ,(location_update) => {
+                   setCoordinates(location_update.coords)
+                   }
+                 )}               
+                }
+              })();
+        }
+    },[isAuthenticated])
+
+    useEffect(()=>{
+        if(isAuthenticated && socketConnection){
+            (async () => {
+                let { status } = await  Location.requestForegroundPermissionsAsync();
+               if (status !== 'granted') {
+                  console.log('Permission to access location was denied');
+                  return;
+               } else {
+                 console.log('Access granted!!')
+                 
+                 if (status === 'granted') {
+                   let loc1 = await Location.getCurrentPositionAsync({accuracy:Location.Accuracy.BestForNavigation})
+                   setCoordinates(loc1.coords)
+                   updateCoordinates(coordinates)             
+                }}
+              })();
+        }
+    },[isAuthenticated, socketConnection])
+
+    useEffect(()=>{
+        if(isAuthenticated && socketConnection){
+            updateCoordinates(coordinates)
+        }
+    },[coordinates])
     
-        });
-    
-        return () => {
-          subscription.remove();
-        };
-      }, [isAuthenticated]);
-
-
     if (loading) {
         return null;
     }
-
-
 
     return (
         <View style={{ flex: 1, position: "relative", backgroundColor:"white"}}>
@@ -327,11 +368,28 @@ const Navigation = () => {
                                     component={SignIn}
                                     options={{ headerShown: false }}
                                 />
+
+                                <RootStack.Screen
+                                    name="ResetPassword"
+                                    component={ResetPassword}
+                                    options={{ headerShown: false }}
+                                />
+
                             </>
                        
                         }
                 
                     </RootStack.Navigator>
+                    <FlashMessage 
+                        position="top" 
+                        duration={2500}
+                        style={{
+                            marginTop: StatusBar.currentHeight,
+                            minHeight: 0, 
+                            padding: 10, 
+                            fontFamily: `${font}-Regular`,                            
+                            }} />
+
                 </NavigationContainer>
             </AppearanceProvider>
         </View>

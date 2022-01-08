@@ -7,18 +7,21 @@ User = get_user_model()
 
 class MemberMessages(models.Model):
     sender = models.ForeignKey(User, related_name="message_author",
-                               on_delete=models.SET_NULL, null=True)
-    receiver = models.ForeignKey(User, related_name="message_reciever",
-                               on_delete=models.SET_NULL, null=True)
+                               related_query_name='s',
+                               on_delete=models.SET_NULL,
+                               null=True)
+    reciever = models.ForeignKey(User, related_name="message_reciever",
+                                on_delete=models.SET_NULL,
+                                related_query_name='r',
+                                null=True)
     content = models.TextField()
-    room_name = models.CharField(max_length=500)
     timestamp = models.DateTimeField(default=timezone.now)
     is_seen = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.sender} ({self.timestamp.strftime('%d-%m-%Y, %H:%M')})"
+        return f"{self.content[0:30]} . . . ({self.timestamp.strftime('%d-%m-%Y, %H:%M')})"
 
     class Meta:
-        ordering = ('timestamp',)
+        ordering = ('-timestamp',)
 
 

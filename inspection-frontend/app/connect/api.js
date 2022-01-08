@@ -45,7 +45,7 @@ UserAxios.interceptors.response.use((response) => {
             store.dispatch(Logout())
         }
     }
-    return Promise.reject(error.message);
+    return Promise.reject(error);
 });
 
 
@@ -82,7 +82,14 @@ export const endPoints = {
     managerprofile: 'accounts/managerprofile/',
     updatestatus:'inspectionapp/updatestatus/',
     updatetodostatus: 'inspectionapp/updatetodostatus/',
-    getUserDetails: 'accounts/usersdetails/'
+    addExpoToken: 'accounts/expotoken/',
+    removeExpoToken: 'accounts/removeExpoToken/',
+    updateNotificationCount: 'accounts/updateNotificationCount/',
+    updateUserDetails: (id) => `accounts/updateUserProfile/${id}/`,
+    changePassword: 'accounts/change-password/',
+    messengerList: 'chats/messengerList',
+    getNotification: 'notification/fetch/',
+    fetchmessages: 'chats/fetchmessages/'
 }
 
 
@@ -197,10 +204,38 @@ export const InspectionAPI = {
         params:{status,id}
     }).then(responseBody),
 
-    //for getting user profile url and name
-    getUserProfileDetails: (id) => UserAxios.get(`${BASE_URL}/${endPoints.getUserDetails}`,{
-        params:{id}
+    //for adding and updating expo token
+    addExpoToken: (body) => requests.post(`${BASE_URL}/${endPoints.addExpoToken}`, body),
+
+    //for removing exopot token
+    removeExpoToken: (token) => UserAxios.get(`${BASE_URL}/${endPoints.removeExpoToken}`,{
+        params:{token}
     }).then(responseBody),
+
+    //for updating user details
+    updateUserDetails: (data, id) => requests.put(`${BASE_URL}/${endPoints.updateUserDetails(id)}`, data),
+
+    //for changing password
+    changePassword: (data) => requests.put(`${BASE_URL}/${endPoints.changePassword}`, data),
+
+    //reset password 
+    resetPasswordHandler: () => {},
+
+    //getting Messenger list and details
+    getMessengerDetails: (data) => UserAxios.get(`${BASE_URL}/${endPoints.messengerList}`,{
+        params:{page:data}
+    }).then(responseBody),
+
+    //getting notification
+    getNotifications: (data) => UserAxios.get(`${BASE_URL}/${endPoints.getNotification}`,{
+        params:{page:data}
+    }).then(responseBody),
+
+    //for fetching messages
+    fetchMessages: (page, id) => UserAxios.get(`${BASE_URL}/${endPoints.fetchmessages}`,{
+        params:{ page: page, selectedUser: id}
+    }).then(responseBody),
+
 
 }
 

@@ -13,3 +13,11 @@ class ProfileSerializerv1(serializers.ModelSerializer):
         model = Profile
         fields = ['first_name', 'last_name', 'profile_image']
 
+
+class ChangePasswordSerializer(serializers.Serializer):
+    model = User
+    """
+    Serializer for password change endpoint.
+    """
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True, min_length=8)

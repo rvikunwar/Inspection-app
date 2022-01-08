@@ -40,10 +40,34 @@ export const setUserProfile = (payload) => dispatch => {
     })
 }
 
+export const editUserProfile = (payload) => dispatch => {
+
+    dispatch({
+        type: actionTypes.EDIT_CURRENT_USER_DETAILS,
+        payload
+    })
+}
+
+
 export const setUnseenMessages = (payload) => dispatch => {
 
     dispatch({
         type: actionTypes.SET_UNSEEN_MESSAGES_COUNT,
+        payload: payload
+    })
+}
+
+export const setExpoToken = (payload) => dispatch => {
+
+    dispatch({
+        type: actionTypes.SET_EXPO_TOKEN,
+        payload
+    })
+}
+
+export const notiMsgCount = (payload) => dispatch => {
+    dispatch({
+        type: actionTypes.SET_MESSAGE_NOTIFICATION_COUNT,
         payload
     })
 }

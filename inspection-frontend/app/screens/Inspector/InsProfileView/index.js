@@ -40,6 +40,7 @@ const InsProfileView = () => {
     const scrollY = useRef(new Animated.Value(0)).current;
     const inspector = route.params?.profile 
     const department = route.params?.department
+    const area = route.params?.area
 
 
     useEffect(() => {
@@ -441,9 +442,7 @@ const InsProfileView = () => {
                                         right: 80
                                 }]} 
                                 onPress={()=>{
-                                 navigation.navigate("Messages",{ selectedUser: inspector.user, 
-                                    selectedUser_image: `${HOST_URL}${inspector.profile_image}`, 
-                                    profile: inspector });
+                                 navigation.navigate("Messages",{ selectedUser: inspector });
                                 }}
                             >
                                 <Icon name="facebook-messenger" size={20} solid style={{color: colors.primary }}/>    
@@ -463,7 +462,10 @@ const InsProfileView = () => {
                                     paddingHorizontal:0
                                 }}
                                     onPress={()=>{
-                                        navigation.navigate("CreateTask",{ profile: inspector });
+                                        navigation.navigate("CreateTask",{ 
+                                            profile: inspector, 
+                                            area: area, 
+                                            department: department });
                                     }}>
                                     <Text
                                         style={{

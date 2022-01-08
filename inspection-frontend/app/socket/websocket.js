@@ -18,12 +18,12 @@ export class WebSocketService {
     }
 
 
-    connect(room_name, service) {
+    connect(room_name) {
 
         if(room_name != null){
             let access_token = store.getState().auth.login.token_access
 
-            const path =`${SOCKET_URL}/ws/${service}/${room_name}/?token=${access_token}`;
+            const path =`${SOCKET_URL}/ws/chat/${room_name}/?token=${access_token}`;
 
             this.socketRef = new WebSocket(path);
 
@@ -39,9 +39,9 @@ export class WebSocketService {
                 console.log(e.message);
             };
 
-            this.socketRef.onclose = () => {
-                console.log("WebSocket closed let's reopen");
-                this.connect();
+            this.socketRef.onclose = (value) => {
+                console.log("WebSocket closed let's reopen", room_name);
+                
             };
         }
 
@@ -58,31 +58,10 @@ export class WebSocketService {
         if (Object.keys(this.callbacks).length === 0) {
             return;
         }
-        if (command === "fetch_messages") {
-            this.callbacks[command](parsedData.message);
-        }
+
         if (command === "new_message") {
             this.callbacks[command](parsedData.message);
         }
-        if(command === "online_status"){
-            this.callbacks[command](parsedData);
-        }
-    }
-    
-    fetchMessegerList(currentUser, selectedUser) {
-        this.sendMessage({
-            command: "mesenger_list",
-            currentUser,
-            selectedUser,
-        })
-    }
-
-    fetchMessages(currentUser, selectedUser) {
-        this.sendMessage({
-            command: "fetch_messages",
-            currentUser,
-            selectedUser,
-        });
     }
 
     newMessage(message) {
@@ -95,26 +74,10 @@ export class WebSocketService {
         });
     }
 
-    onlineStatus(data){
-        this.sendMessage({
-            command: "online_status",
-            user: data.user,
-            status: data.status
-        })
-    }
-
-    addCallbacks({setMessagesfunc, addMessagesfunc, UserDetails}) {
-
-        if(typeof setMessagesfunc === "function"){
-            this.callbacks["fetch_messages"] = setMessagesfunc;
-        }
+    addCallbacks({ addMessagesfunc }) {
 
         if(typeof addMessagesfunc === "function"){
             this.callbacks["new_message"] = addMessagesfunc;
-        }
-
-        if(typeof UserDetails === "function"){
-            this.callbacks["online_status"] = UserDetails;
         }
 
     }

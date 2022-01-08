@@ -39,8 +39,8 @@ export default StyleSheet.create({
     thumb: {
         borderWidth: 1,
         borderColor: BaseColor.whiteColor,
-        width: 50,
-        height: 50,
+        width: 60,
+        height: 60,
         borderRadius: 100,
         overflow: "hidden",
         borderWidth: 1,

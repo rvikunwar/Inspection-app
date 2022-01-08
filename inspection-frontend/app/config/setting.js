@@ -20,6 +20,8 @@ export const BaseSetting = {
         }
     },
 	 resourcesFont: {
+		"Droidkufi-Regular": require("../assets/fonts/DroidKufi-Regular.ttf"),
+		"Droidkufi-Bold": require("../assets/fonts/DroidKufi-Bold.ttf"),
         "Merriweather-Black": require("../assets/fonts/Merriweather-Black.ttf"),
 		"Merriweather-BlackItalic": require("../assets/fonts/Merriweather-BlackItalic.ttf"),
 		"Merriweather-Bold": require("../assets/fonts/Merriweather-Bold.ttf"),

@@ -13,6 +13,12 @@ import Messages from "@screens/Messages"
 import Camera from '@screens/Camera'
 import PreviewMap from "@screens/PreviewMap"
 import TodoCreate from "@screens/TodoCreate"
+import ProfileEdit from "@screens/ProfileEdit"
+import ChangePassword from '@screens/ChangePassword'
+import Setting from '@screens/Settings'
+import ThemeSetting from '@screens/Settings/ThemeSetting'
+import FontOption from '@screens/Settings/FontOption'
+import SelectDarkOption from '@screens/Settings/SelectDarkTheme'
 
 
 export const InspectorMainScreens = {
@@ -71,8 +77,6 @@ export const InspectorMainScreens = {
 }
     
 
-
-
 export const MangerMainScreens = {
 
     TaskEdit: {
@@ -113,6 +117,60 @@ export const CommonMainScreens = {
         component: PreviewMap,
         options: {
             title: "map",
+            headerShown:false,
+            tabBarIcon: ({ color }) => tabBarIcon({ color, name: "tasks" }),
+        },   
+    },
+
+    Setting: {
+        component: Setting,
+        options: {
+            title: "Settings",
+            headerShown:false,
+            tabBarIcon: ({ color }) => tabBarIcon({ color, name: "tasks" }),
+        },   
+    },
+
+    FontOption: {
+        component: FontOption,
+        options: {
+            title: "Font options",
+            headerShown:false,
+            tabBarIcon: ({ color }) => tabBarIcon({ color, name: "tasks" }),
+        },   
+    },
+
+    ThemeSetting: {
+        component: ThemeSetting,
+        options: {
+            title: "Theme Settings",
+            headerShown:false,
+            tabBarIcon: ({ color }) => tabBarIcon({ color, name: "tasks" }),
+        },   
+    },
+
+    SelectDarkOption: {
+        component: SelectDarkOption,
+        options: {
+            title: "Select Dark Option",
+            headerShown:false,
+            tabBarIcon: ({ color }) => tabBarIcon({ color, name: "tasks" }),
+        },
+    },
+
+    ChangePassword: {
+        component: ChangePassword,
+        options: {
+            title: "Change password",
+            headerShown:false,
+            tabBarIcon: ({ color }) => tabBarIcon({ color, name: "tasks" }),
+        },
+    },
+
+    ProfileEdit: {
+        component: ProfileEdit,
+        options: {
+            title: "Profile edit",
             headerShown:false,
             tabBarIcon: ({ color }) => tabBarIcon({ color, name: "tasks" }),
         },   

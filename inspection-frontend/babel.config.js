@@ -36,7 +36,8 @@ module.exports = function(api) {
                   "@navigation": "./app/navigation",
                   "@common": "./app/common",
                   "@connect": "./app/connect",
-                  "@container": "./app/containers"
+                  "@container": "./app/containers",
+                  "@socket": "./app/socket"
                   
               },
           },

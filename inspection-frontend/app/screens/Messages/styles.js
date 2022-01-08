@@ -16,16 +16,17 @@ export default StyleSheet.create({
     marginLeft: 8,
   },
   userContent: {
+    width: '91.8%',
     paddingVertical: 8,
     paddingHorizontal: 16,
     flexDirection: 'row',
     
   },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderWidth: 3,
+    width: 45,
+    height: 45,
+    borderRadius: 23,
+    borderWidth: 2,
     marginTop: 2.4,
   },
   userContentMessage: {

@@ -21,12 +21,11 @@ export default StyleSheet.create({
     top: 0,
     alignSelf: "center",
     position: "absolute",
-    // zIndex: 999,
-    paddingBottom: 20,
+    zIndex: 10,
   },
   map: {
     width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
+    height: Dimensions.get('window').height ,
   },
   // imgBanner: {
   //     width: "100%",

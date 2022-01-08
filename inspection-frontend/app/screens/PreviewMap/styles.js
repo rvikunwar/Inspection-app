@@ -8,6 +8,30 @@ export default StyleSheet.create({
     padding: 20,
     width: "100%"
   },
+  container: {
+    alignItems:"center", 
+    justifyContent:"center", 
+    width:50, 
+    height:40, 
+    position:"absolute", 
+    top:30, 
+    zIndex:100000, 
+    right:2
+  },
+  ProfileCardView: {
+    width:'100%', 
+    position: "absolute", 
+    bottom:100
+  },
+  containerProfile: {
+    width: '90%', 
+    marginLeft:'5%', 
+    height: 118, 
+    backgroundColor:"rgba(255,255,255,0.6)", 
+    borderRadius:10,
+    paddingVertical:10,
+    paddingHorizontal:15
+  },
   textInput: {
     height: 46,
     backgroundColor: BaseColor.fieldColor,
@@ -33,5 +57,69 @@ export default StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center"
-  }
+  },
+  container: {
+    padding: 20,
+    paddingTop: 0,
+},
+specifications: {
+    marginVertical: 10,
+    flexDirection: "row",
+    alignItems: "center",
+},
+wrapContent: {
+    flexWrap: "wrap",
+    flexDirection: "row",
+    borderColor: BaseColor.dividerColor,
+    marginBottom: 20,
+},
+headerImageStyle: {
+    height: 250,
+    width: "100%",
+    top: 0,
+    alignSelf: "center",
+    position: "absolute",
+    // zIndex: 999,
+    paddingBottom: 20,
+},
+contain: {
+    flexDirection: "row"
+},
+contentRate: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 10
+},
+
+header: {
+    flexDirection: "row",
+    alignItems: "center",
+},
+viewIcon: {
+    borderRadius: 20,
+    width: 20,
+    height: 20,
+    marginRight: 10,
+    justifyContent: "center",
+    alignItems: "center",
+},
+viewIcon1: {
+    borderRadius: 40,
+    width: 40,
+    height: 40,
+    marginRight: 0,
+    justifyContent: "center",
+    alignItems: "center",
+},
+icon: {
+    width: 20,
+    height: 20,
+},
+headerStyle: {
+    height: "auto",
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    // zIndex: 200
+},
 });

@@ -325,8 +325,27 @@ const TaskView = () => {
                                 flexDirection:"row", 
                                 justifyContent:"space-between", 
                                 alignItems:"center"}}>
+                                <View
+                                    style={{
+                                        flexDirection: "row",
+                                        alignItems: "center",
+                                    }}
+                                >
+                                    {member?
+                                    <>
+                                        <ProfileAuthor
+                                            style={{ flex: 0.8}}
+                                            image={{uri:`${HOST_URL}${member.profile_image}`}}
+                                            name={`${member.first_name} ${member.last_name}`}
+                                            description={'(Inspector)'}
+                                        />
+                                        </>:
+                                        <View style={{height:30, width:70,paddingTop:4}}>
+                                            <LoadingDots bounceHeight={2} size={16}/>
+                                        </View>
+                                }
 
-                                <Text title3>{item.title}</Text>
+                                </View>
                                 <TouchableOpacity style={{
                                     zIndex:1000, 
                                     alignItems:"flex-end", 
@@ -337,28 +356,8 @@ const TaskView = () => {
                                 </TouchableOpacity>
 
                             </View>
+                            <Text title3>{item.title}</Text>
 
-                            <View
-                                style={{
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                }}
-                            >
-                                {member?
-                                <>
-                                    <ProfileAuthor
-                                        style={{ flex: 1 }}
-                                        image={{uri:`${HOST_URL}${member.profile_image}`}}
-                                        name={`${member.first_name} ${member.last_name}`}
-                                        description={'(Inspector)'}
-                                    />
-                                    </>:
-                                    <View style={{height:30, width:70,paddingTop:4}}>
-                                        <LoadingDots bounceHeight={2} size={16}/>
-                                    </View>
-                               }
-
-                            </View>
                             <Text body2 light style={{ paddingVertical: 0 }}>
                                 {item.description}
                             </Text>
