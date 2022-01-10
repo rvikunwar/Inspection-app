@@ -34,7 +34,21 @@ export default function AreaListView(props) {
         <View style={{
             paddingTop:30,
         }}>
-            <Header title="ALLOCATED AREAS"/>
+            <Header 
+                title="ALLOCATED AREAS"
+                renderLeft={() => {
+                    return (
+                    <Icon
+                        name="angle-left"
+                        size={20}
+                        color="#D1D1D1"
+                        enableRTL={true}
+                    />
+                    );
+                }}
+                onPressLeft={() => {
+                    navigation.goBack();
+                }}/>
             <View style={{paddingHorizontal:20, marginBottom:15}}>
                 <TextInput
                     onChangeText={filterCategory}

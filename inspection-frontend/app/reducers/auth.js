@@ -22,7 +22,9 @@ const initialState = {
         profile_image: null,
         unseen_messages: 0,
         expo_token:null,
-        notfication_count:0
+        notfication_count:0,
+        latitude: null,
+        longitude: null
     },
 };
 
@@ -58,6 +60,8 @@ export default (state = initialState, { type, payload } = action) => {
                         user_id: payload.user,
                         profile_image: payload.profile_image,
                         unseen_messages: payload.un_seen_messages,
+                        latitude: payload.latitude,
+                        longitude: payload.longitude
                     }
                 }
             case actionTypes.EDIT_CURRENT_USER_DETAILS:

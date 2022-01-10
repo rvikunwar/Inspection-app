@@ -23,6 +23,15 @@ export default StyleSheet.create({
     position: "absolute",
     zIndex: 10,
   },
+
+  headerImageStylev1: {
+    width: "100%",
+    top: -35,
+    alignSelf: "center",
+    position: "absolute",
+    zIndex: 10,
+  },
+
   map: {
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height ,

@@ -28,26 +28,16 @@ import { InspectionAPI } from "@connect/api";
 import { HOST_URL } from "@env"
 import Procfile from '@assets/images/procfile.jpg'
 import { darkStyle } from '../../PreviewMap/darkStyle'
-import { StatusBar } from 'expo-status-bar';
 
 
 const AreaView = (props) => {
     const { navigation, route } = props;
     const { t } = useTranslation();
     const { colors } = useTheme();
-    const [loading, setLoading] = useState(true);
     const [heightHeader, setHeightHeader] = useState(Utils.heightHeader());
     const scrollY = useRef(new Animated.Value(0)).current;
     
     const  { area, entity }  = route.params;
-
-
-    useEffect(() => {
-        setTimeout(() => {
-            setLoading(false);
-        }, 1000);
-    }, []);
-
 
     //For header background color from transparent to header color
     const headerBackgroundColor = scrollY.interpolate({
@@ -59,7 +49,7 @@ const AreaView = (props) => {
 
     //For header image opacity
     const headerImageOpacity = scrollY.interpolate({
-        inputRange: [0, 300 - heightHeader],
+        inputRange: [0, 250 - heightHeader - 20],
         outputRange: [1, 0],
         extrapolate: "clamp",
         useNativeDriver: true,
@@ -71,7 +61,6 @@ const AreaView = (props) => {
         outputRange: [250, heightHeader],
         useNativeDriver: true,
     });
-
 
 
     /**
@@ -89,21 +78,8 @@ const AreaView = (props) => {
         }
   
     },[route.params?.inspectors])
+
     const department = route.params?.entity
-
-    const renderPlaceholder = () => {
-        let holders = Array.from(Array(7));
-
-        return (
-            <Placeholder>
-                <View style={{padding: 20}}>
-                  {holders.map((item, index) => (
-                      <PlaceholderLine style={{height:10, marginBottom:30}} key={index} width={100}/>
-                  ))}
-              </View>
-            </Placeholder>
-        );
-    };
 
 
     const [keyword, setKeyword] = useState("");
@@ -153,92 +129,72 @@ const AreaView = (props) => {
           
           }, [refreshing]);
 
-  const renderContent = () => {
-    return (
-      <View style={{ flex: 1, paddingHorizontal: 20 }}>
+    const renderContent = () => {
+        return (
+            <View style={{ flex: 1, paddingHorizontal: 20 }}>
 
-      <FlatList
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          data={users}
-          keyExtractor={(item) => item.id}
-          refreshControl={
-            <RefreshControl
-                elevation={1}
-                colors={[colors.primary]}
-                tintColor={colors.primary}
-                refreshing={refreshing}
-                onRefresh={onRefresh}
-            />
-        }
-          renderItem={({ item, index }) => (
-              <ListTextButton
-                  style={{paddingHorizontal:7, marginTop:0}}
-                  image={item.profile_image?{uri:`${HOST_URL}${item.profile_image}`}:Procfile}
-                  name={item.first_name +" "+ item.last_name}
-                  description={item.email}
-                  online={item.online}
-                  onPress={() => {
-                    navigation.navigate("InsProfileView",{ profile: item, department:entity, area:area  });
-                  }}
-                  componentRight={
-                      <Tag
-                          outline
-                          style={{
-                              paddingHorizontal: 20,
-                              backgroundColor: colors.background,
-                          }}
-                      >
-                          {"check"}
-                      </Tag>
-                  }
-              />
-          )}
-      />
-  </View>
-    );
-  };
+                {users.map((item, index)=>(
+                    <ListTextButton
+                        key={index}
+                        style={{paddingHorizontal:7, marginTop:0}}
+                        image={item.profile_image?{uri:`${HOST_URL}${item.profile_image}`}:Procfile}
+                        name={item.first_name +" "+ item.last_name}
+                        description={item.email}
+                        online={item.online}
+                        onPress={() => {
+                            navigation.navigate("InsProfileView",{ profile: item, department:entity, area:area  });
+                        }}
+                        componentRight={
+                            <Tag
+                                outline
+                                style={{
+                                    paddingHorizontal: 20,
+                                    backgroundColor: colors.background,
+                                }}
+                            >
+                                {"check"}
+                            </Tag>
+                        }/>
+                ))}
+
+            </View>
+        );
+    };
 
   return (
     <View style={{ flex: 1 }}>
-        <StatusBar style="light" />
-
-        <SafeAreaView
-            style={[BaseStyle.safeAreaView]}
-            forceInset={{ top: "always", bottom: "always" }}>
-            <Header title={entity?.name} />
-            <ScrollView
-                onContentSizeChange={() => {
-                  setHeightHeader(Utils.heightHeader());
-                }}
-                // showsHorizontalScrollIndicator={false}
-                // showsVerticalScrollIndicator={false}
-                overScrollMode={"never"}
-                style={{ zIndex: 10 }}
-                scrollEventThrottle={16}
-                onScroll={Animated.event(
-                  [
-                    {
-                      nativeEvent: {
-                        contentOffset: { y: scrollY },
-                      },
-                    },
-                  ],
-                  {
-                    useNativeDriver: false,
-                  }
-              )}>
-            <View style={{ height: 220 - heightHeader,   }} />
-            <View
+      <SafeAreaView
+        style={[BaseStyle.safeAreaView]}
+        forceInset={{ top: "always", bottom: "always" }}
+      >
+        <Header title={entity?.name} />
+        <ScrollView
+          onContentSizeChange={() => {
+            setHeightHeader(Utils.heightHeader());
+          }}
+          // showsHorizontalScrollIndicator={false}
+          // showsVerticalScrollIndicator={false}
+          overScrollMode={"never"}
+          style={{ zIndex: 10 }}
+          scrollEventThrottle={16}
+          onScroll={Animated.event(
+            [
+              {
+                nativeEvent: {
+                  contentOffset: { y: scrollY },
+                },
+              },
+            ],
+            {
+              useNativeDriver: false,
+            }
+          )}
+        >
+          <View style={{ height: 230 - heightHeader }} />
+          <View
                 style={{
-                  borderTopLeftRadius: 30,
-                  borderTopRightRadius:30,                  
-                  backgroundColor:'white',
-                  marginVertical: 1,
+                  marginTop: 10,
                   paddingHorizontal: 20,
-                  paddingTop: 20,
-                  marginTop:0,
-                  zIndex:10
                 }}>
               <Text subhead>{entity?.name} </Text>
               <Text title3 style={{ marginVertical: 10, marginVertical: 4 }}>
@@ -268,74 +224,77 @@ const AreaView = (props) => {
                     }
                 />
             </View>
-            {loading ? renderPlaceholder() : renderContent()}
+            {renderContent()}
         </ScrollView>
-    
+
       </SafeAreaView>
+      
       <Animated.View
-          style={[
-            styles.headerImageStyle,
-            {
-              opacity: headerImageOpacity,
-              height: heightViewImg,
-            },
-          ]}>
-      <TouchableOpacity
-          style={{ flex: 1 }}
-          activeOpacity={1}
-          onPress={() =>
-              navigation.navigate("PreviewMap", { area, users, department })
-          }>
-          <MapView style={[styles.map, { width: "100%"}]}
-              showsBuildings={true}
-              showsTraffic={true}
-              showsIndoors={true}
-              scrollEnabled={false}
-              pitchEnabled={true}
-              showsIndoors={true}
-              customMapStyle={darkStyle}
-              initialRegion={{
-                  latitude: parseFloat(area.latitude),
-                  longitude: parseFloat(area.longitude),
-                  latitudeDelta: 0.01,
-                  longitudeDelta: 0.02,
-            }}/>
-      </TouchableOpacity>
-           
+        style={[
+          styles.headerImageStyle,
+          {
+            opacity: headerImageOpacity,
+            height: heightViewImg,
+          },
+        ]}
+      >
+              <TouchableOpacity
+                style={{ flex: 1 }}
+                activeOpacity={1}
+                onPress={() =>
+                    navigation.navigate("PreviewMap", { area, users, department })
+                }>
+                  <MapView style={[styles.map, { width: "100%", flex: 1}]}
+                      showsBuildings={true}
+                      showsTraffic={true}
+                      showsIndoors={true}
+                      scrollEnabled={false}
+                      pitchEnabled={true}
+                      showsIndoors={true}
+                      customMapStyle={darkStyle}
+                      initialRegion={{
+                          latitude: parseFloat(area.latitude),
+                          longitude: parseFloat(area.longitude),
+                          latitudeDelta: 0.01,
+                          longitudeDelta: 0.02,
+                    }}/>
+            </TouchableOpacity>
+          
+
       </Animated.View>
       <Animated.View style={[styles.headerStyle, { position: "absolute" }]}>
-          <SafeAreaView
-            style={{ width: "100%" }}
-            forceInset={{ top: "always", bottom: "never" }}>
-            <Header
-                title=""
-                style={{color:"black"}}
-                barStyle=""
-                renderLeft={() => {
-                    return (
-                        <Animated.Image
-                            resizeMode="contain"
-                            style={[
-                              styles.icon,
-                              {
-                                transform: [
-                                  {
-                                    scaleX: I18nManager.isRTL ? -1 : 1,
-                                  },
-                                ],
-                                tintColor: "black",
-                              },
-                            ]}
-                            source={Images.angleLeft}
-                        />
-                    );
-                }}
-                onPressLeft={() => {
-                  navigation.goBack();
-                }}
-            />
-          </SafeAreaView>
+        <SafeAreaView
+          style={{ width: "100%" }}
+          forceInset={{ top: "always", bottom: "never" }}
+        >
+          <Header
+            title=""
+            renderLeft={() => {
+              return (
+                <Animated.Image
+                  resizeMode="contain"
+                  style={[
+                    styles.icon,
+                    {
+                      transform: [
+                        {
+                          scaleX: I18nManager.isRTL ? -1 : 1,
+                        },
+                      ],
+                      tintColor: headerBackgroundColor,
+                    },
+                  ]}
+                  source={Images.angleLeft}
+                />
+              );
+            }}
+            onPressLeft={() => {
+              navigation.goBack();
+            }}
+          />
+        </SafeAreaView>
       </Animated.View>
+
     </View>
   );
 };

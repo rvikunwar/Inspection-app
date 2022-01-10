@@ -79,7 +79,6 @@ export const endPoints = {
     managerstat: 'inspectionapp/managerstat/',
     inspectorstat: 'inspectionapp/inspectorstat/',
     areastat: 'inspectionapp/areastat/',
-    managerprofile: 'accounts/managerprofile/',
     updatestatus:'inspectionapp/updatestatus/',
     updatetodostatus: 'inspectionapp/updatetodostatus/',
     addExpoToken: 'accounts/expotoken/',
@@ -191,8 +190,6 @@ export const InspectionAPI = {
     getAreaStat: (id, entity) => UserAxios.get(`${BASE_URL}/${endPoints.areastat}`,{
             params:{id, entity}
         }).then(responseBody),
-
-    getManagerProfile: () =>  requests.get(`${BASE_URL}/${endPoints.managerprofile}`),
 
     //update status of task
     updateStatus: ({status, id}) => UserAxios.get(`${BASE_URL}/${endPoints.updatestatus}`,{

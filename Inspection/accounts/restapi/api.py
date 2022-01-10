@@ -44,15 +44,6 @@ class MemberProfileDetails(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class GetManagerProfile(APIView):
-    def get(self, request):
-        user = request.user.id
-        manager = Manager.objects.get(inspector_allocated=user)
-        profile = Profile.objects.get(user=manager.user)
-        serializer = ProfileSerializer(profile)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
 class GetUserPersonalDetails(APIView):
     def get(self, request):
         user = request.query_params.get('id')

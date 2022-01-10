@@ -9,19 +9,17 @@ export default StyleSheet.create({
     width: "100%"
   },
   container: {
-    alignItems:"center", 
-    justifyContent:"center", 
     width:50, 
     height:40, 
     position:"absolute", 
-    top:30, 
+    top:40, 
     zIndex:100000, 
-    right:2
+    right:20
   },
   ProfileCardView: {
     width:'100%', 
     position: "absolute", 
-    bottom:100
+    bottom: 100
   },
   containerProfile: {
     width: '90%', 
@@ -58,10 +56,7 @@ export default StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center"
   },
-  container: {
-    padding: 20,
-    paddingTop: 0,
-},
+
 specifications: {
     marginVertical: 10,
     flexDirection: "row",

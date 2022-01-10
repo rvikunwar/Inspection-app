@@ -7,17 +7,15 @@ import {
     Button
 } from "@components";
 import { Images, BaseColor, useTheme } from "@config";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TouchableOpacity, View } from "react-native";
 import styles from "./styles";
 import MapView from 'react-native-maps';
-import { retroMapStyle } from './retroStyle'
 import { darkStyle } from './darkStyle'
 import { HOST_URL } from "@env"
 import { parseHexTransparency } from "@utils";
 import { useNavigation } from "@react-navigation/native";
-
-
+import { useSelector } from "react-redux";
 
 const imagesInit = [
     { id: "1", image: Images.location1, selected: true },
@@ -192,6 +190,8 @@ export default function PreviewMap({ navigation, route }) {
     const [ selectedProfile, setSelectedProfile ] = useState()
     const [ open, setOpen ] = useState(false)
 
+    const latitude = useSelector(state =>   state.auth.user.latitude)
+    const longitude = useSelector(state =>   state.auth.user.longitude)
 
     const onSelect = (indexSelected) => {
         setIndexSelected(indexSelected);
@@ -229,60 +229,33 @@ export default function PreviewMap({ navigation, route }) {
     const department = route?.params?.department
 
 
-    //FILTERING   
-    const [keyword, setKeyword] = useState("");
 
-    const filterCategory = (text) => {
-        setKeyword(text);
-        // if (text) {
-        //     setAreas(
-        //         areasv1.filter(
-        //             (item) =>
-        //                 haveChildren(item.name, text)
-        //         )
-        //     );
-        // } else {
-        //     setAreas(areas);
-        // }
-    };
+    const defaultProfile = () => {
+        for(let i=0; i<inspectors.length; i++){
+            if(inspectors[i].online){
+                setSelectedProfile(inspectors[i])
+                setOpen(true)
+                return
+            }
+        }
+    }
+
+    useEffect(()=>{
+        defaultProfile()
+    },[inspectors])
 
 
 
     return (
         <View>
-            {/* <TouchableOpacity 
+            <TouchableOpacity 
                 style={styles.container}  
                 onPress={() => {
                     navigation.goBack();
                 }}>
-                <Icon name="times" size={20}  color={"gray"}/>
-            </TouchableOpacity> */}
-            <TouchableOpacity
-                style={{
-                    zIndex:10000,
-                    width:'100%',
-                    paddingHorizontal:30,
-                    marginBottom:10,
-                    position:'absolute',
-                    top:50,
-                }}>
-                <TextInput
-                    onChangeText={filterCategory}
-                    style={{elevation:3}}
-                    placeholder={"location, name"}
-                    value={keyword}
-                    keyboardType={null}
-                    icon={
-                        <TouchableOpacity onPress={() => filterCategory("")}>
-                            <Icon
-                                name="times"
-                                size={16}
-                                color={BaseColor.grayColor}
-                            />
-                        </TouchableOpacity>
-                    }
-                />
+                <Icon name="times" size={20}  color={"white"}/>
             </TouchableOpacity>
+
 
             <MapView style={styles.map}
                 showsBuildings={true}
@@ -291,18 +264,35 @@ export default function PreviewMap({ navigation, route }) {
                 pitchEnabled={true}
                 customMapStyle={darkStyle}
                 initialRegion={{
-                    latitude: parseFloat(area?.latitude),
-                    longitude: parseFloat(area?.longitude),
+                    latitude: parseFloat(selectedProfile?.latitude? selectedProfile.latitude: area?.latitude),
+                    longitude: parseFloat(selectedProfile?.longitude?selectedProfile.longitude: area?.longitude),
                     latitudeDelta: 0.009,
                     longitudeDelta: 0.009,
                 }}>
+                {latitude&&
+                    <MapView.Marker
+                        coordinate={{
+                            latitude: parseFloat(latitude), 
+                            longitude: parseFloat(longitude)}}>
+                            <View style={{ flexDirection:'row'}}>
+
+                                <Icon 
+                                    name='map-marker-alt' 
+                                    size={30}
+                                    color={'#EF3612'}/>
+
+                            </View>
+
+                    </MapView.Marker>
+                }
                 {inspectors.map((item, index)=>(
                     item.longitude && item.online && 
                     <MapMarkerView 
                         item={item} 
                         key={index} 
                         setSelectedProfile={setSelectedProfile}
-                        setOpen={setOpen}/>
+                        setOpen={setOpen}
+                        currentUser={{latitude,longitude}}/>
                 ))}
             </MapView>
             { open && <ProfileCardView inspector={selectedProfile} area={area} department={department}/>}

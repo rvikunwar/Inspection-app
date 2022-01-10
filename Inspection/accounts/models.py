@@ -28,7 +28,7 @@ class Profile(models.Model):
     entity = models.ForeignKey(Entity, on_delete=models.SET_NULL, null=True)
     online = models.BooleanField(default=False)
     un_seen_messages = models.IntegerField(default=0)
-    expo_token = models.ManyToManyField(ExpoToken)
+    expo_token = models.ManyToManyField(ExpoToken, blank=True)
     notification_count = models.IntegerField(default=0)
     latitude = models.DecimalField(
         max_digits=9, decimal_places=6, null=True, blank=True)

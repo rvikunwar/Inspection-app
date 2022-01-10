@@ -12,6 +12,6 @@ export default StyleSheet.create({
         alignItems: "center",
     },
     flatlist:{
-        paddingHorizontal:8
+        paddingHorizontal:8,
     }
 })

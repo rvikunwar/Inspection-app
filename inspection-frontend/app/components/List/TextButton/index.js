@@ -78,7 +78,6 @@ export default function ListTextButton(props) {
 
 ListTextButton.propTypes = {
   style: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
-  image: PropTypes.node.isRequired,
   name: PropTypes.string,
   description: PropTypes.string,
   iconName: PropTypes.string,
@@ -91,7 +90,6 @@ ListTextButton.propTypes = {
 };
 
 ListTextButton.defaultProps = {
-  image: "",
   name: "",
   description: "",
   iconName: "mobile-alt",

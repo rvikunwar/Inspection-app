@@ -107,8 +107,6 @@ export default function Messages({route, navigation}) {
     const count = useSelector(getUnseenMessages)
     const [ socketConnection, setSocketConnection ] = useState(false)
 
-    const dispatch = useDispatch();
-    
 
     /**
      * @description for adding more content messages

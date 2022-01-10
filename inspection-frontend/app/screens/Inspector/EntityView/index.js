@@ -1,34 +1,25 @@
 import {
-    CardReport02,
-    CardReport04,
     Header,
     SafeAreaView,
-    Tag,
     Text,
     ProfileAuthor,
-    ListTextButton,
     Icon,
     PieChart,
     TextInput
 } from "@components";
-import { BaseColor, BaseStyle, useTheme, Images } from "@config";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { BaseColor, BaseStyle, useTheme } from "@config";
 import React, { useEffect, useState, useRef } from "react";
-import { useTranslation } from "react-i18next";
 import { 
     ScrollView, 
     View, 
-    Animated, 
-    I18nManager, 
+    Animated,  
     StyleSheet,
-    FlatList,
     TouchableOpacity,
 } from "react-native";
 import styles from "./styles";
 import { HOST_URL } from "@env"
 import LoadingDots from "react-native-loading-dots";
 import { InspectionAPI } from "@connect/api";
-import { useSelector } from "react-redux";
 import { parseHexTransparency } from "@utils";
 import Area from "./Area";
 
@@ -37,13 +28,7 @@ import Area from "./Area";
 const EntityView = (props) => {
     const { colors } = useTheme();
     const { navigation, route } = props
-    const [itemv1, setItem] = useState();
     const scrollY = useRef(new Animated.Value(0)).current;
-
-
-    /**
-     * @description for viewing department directly
-     */
     const entity = route?.params?.entity
 
 
@@ -64,7 +49,6 @@ const EntityView = (props) => {
    }, [entity]);
 
 
-
     //GET DETAILS OF THE MEMBER (TASK ASSIGNED TO)
     const [ member, setMember ] =  useState()
     useEffect(()=>{
@@ -81,57 +65,38 @@ const EntityView = (props) => {
             isMounted=false
         }
 
-    },[itemv1?.person_in_charge])
-
-
-    //GET MANAGER DETAILS
-    const [ manager, setManager ] =  useState()
-        useEffect(()=>{
-            let isMounted = true
-
-            if(isMounted){
-                InspectionAPI.getManagerProfile().then((res)=>{
-                    setManager(res)
-                }).catch((err)=>{
-                    console.log(err)
-                })
-            }
-            return ()=>{
-                isMounted=false
-            }
-
-    },[])
+    },[entity?.person_in_charge])
 
     
     const data = [
         {
-            name: "New tasks",
+            name: "New",
             count: 0,
             color: "#0E9CF5",
             legendFontColor: "#7F7F7F",
         },
         {
-            name: "Tasks with issue",
+            name: "Issue",
             count: 0,
             color: BaseColor.greenColor,
             legendFontColor: "#7F7F7F",
         },
         {
-            name: "Tasks re-assigned",
+            name: "Re-assigned",
             count: 0,
             color: "#60505A",
             legendFontColor: "#7F7F7F",
         },
     
         {
-            name: "Tasks on progress",
+            name: "Processing",
             count: 0,
             color: BaseColor.pinkColor,
             legendFontColor: "#0E9CF5",
         },
         
         {
-            name: "Completed tasks",
+            name: "Completed",
             count: 0,
             color: BaseColor.accent,
             legendFontColor: "#F4972F",
@@ -141,33 +106,34 @@ const EntityView = (props) => {
     const setStatdata = (res, setFunc) => {
         const data = [
             {
-                name: "New tasks",
+                name: "New",
                 count: res.new,
                 color: "#0E9CF5",
                 legendFontColor: "#7F7F7F",
             },
             {
-                name: "Tasks with issue",
+                name: "Issue",
                 count: res.has_issue,
                 color: BaseColor.greenColor,
                 legendFontColor: "#7F7F7F",
             },
-            {
-                name: "Tasks re-assigned",
-                count: res.re_assigned,
-                color: "#60505A",
-                legendFontColor: "#7F7F7F",
-            },
+
     
             {
-                name: "Tasks on progress",
+                name: "Processing",
                 count: res.processing,
                 color: BaseColor.pinkColor,
                 legendFontColor: "#7F7F7F",
             },
+            {
+                name: "Re-assigned",
+                count: res.re_assigned,
+                color: "#60505A",
+                legendFontColor: "#7F7F7F",
+            },
             
             {
-                name: "Completed tasks",
+                name: "Completed",
                 count: res.completed,
                 color: "#F4972F",
                 legendFontColor: "#7F7F7F",
@@ -183,7 +149,7 @@ const EntityView = (props) => {
     const [inspectorStat, setInspectorStat] = useState(data)
     const role = "INSPECTOR"
     useEffect(()=>{
-
+        //stats of tasks which are assigned by current user in this department
         if(entity.id){
             InspectionAPI.getInspectorStat({role, entity:entity.id})
             .then((res)=>{
@@ -202,7 +168,21 @@ const EntityView = (props) => {
             style={[BaseStyle.safeAreaView]}
             forceInset={{ top: "always", bottom: "always" }}
             >
-            <Header title={entity?.name.toUpperCase()}/>
+            <Header 
+                title={entity?.name.toUpperCase()}
+                renderLeft={() => {
+                    return (
+                    <Icon
+                        name="angle-left"
+                        size={20}
+                        color="#D1D1D1"
+                        enableRTL={true}
+                    />
+                    );
+                }}
+                onPressLeft={() => {
+                    navigation.goBack();
+                }}/>
             <PieChart data={inspectorStat}/>
 
             <ScrollView
@@ -314,9 +294,7 @@ const EntityView = (props) => {
                                             right: 10
                                     }]} 
                                     onPress={()=>{
-                                        navigation.navigate("Messages",{ selectedUser: itemv1.user, 
-                                            selectedUser_image: `${HOST_URL}${itemv1.profile_image}`, 
-                                            profile: itemv1 });
+                                        navigation.navigate("Messages",{ selectedUser: member.user });
                                         }}>
                                     <Icon name="facebook-messenger" size={20} solid style={{color: colors.primary }}/>    
                                 </TouchableOpacity> 
@@ -406,13 +384,9 @@ const EntityView = (props) => {
                             }
                         />
                     </TouchableOpacity>
-                    <FlatList
-                        data={Areas}
-                        keyExtractor={(item, index) => item.id}
-                        renderItem={({ item, index }) => (
-                            <Area item={item} navigation={navigation} entity={entity}/>
-                        )}
-                    />
+                    {Areas.map((data, index)=>(
+                        <Area key={index} item={data} navigation={navigation} entity={entity}/>
+                    ))}
                 </View>
             </ScrollView> 
 

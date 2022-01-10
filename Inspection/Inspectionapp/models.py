@@ -81,7 +81,6 @@ class Todo(models.Model):
 class Files(models.Model):
     file = models.FileField(upload_to="files")
     task = models.ForeignKey(TaskAssigned, on_delete=models.CASCADE)
-    type = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return self.file.name.split('/')[1]

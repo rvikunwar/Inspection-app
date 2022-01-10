@@ -13,7 +13,8 @@ import { haveChildren } from "@utils";
 import { 
     SafeAreaView, 
     TouchableOpacity,
-    FlatList
+    FlatList,
+    KeyboardAvoidingView
 } from "react-native";
 import { BaseColor, BaseStyle, useTheme } from "@config";
 import { useNavigation} from "@react-navigation/native";
@@ -28,33 +29,34 @@ export default function Entity() {
  
     const data = [
         {
-            name: "New tasks",
+            name: "New",
             count: 0,
             color: "#0E9CF5",
             legendFontColor: "#7F7F7F",
         },
         {
-            name: "Tasks with issue",
+            name: "Issue",
             count: 0,
             color: BaseColor.greenColor,
             legendFontColor: "#7F7F7F",
         },
-        {
-            name: "Tasks re-assigned",
-            count: 0,
-            color: "#60505A",
-            legendFontColor: "#7F7F7F",
-        },
+
     
         {
-            name: "Tasks on progress",
+            name: "Processing",
             count: 0,
             color: BaseColor.pinkColor,
             legendFontColor: "#0E9CF5",
         },
+        {
+            name: "Re-assigned",
+            count: 0,
+            color: "#60505A",
+            legendFontColor: "#7F7F7F",
+        },
         
         {
-            name: "Completed tasks",
+            name: "Completed",
             count: 0,
             color: BaseColor.accent,
             legendFontColor: "#F4972F",
@@ -64,33 +66,35 @@ export default function Entity() {
     const setStatdata = (res, setFunc) => {
         const data = [
             {
-                name: "New tasks",
+                name: "New",
                 count: res.new,
                 color: "#0E9CF5",
                 legendFontColor: "#7F7F7F",
             },
             {
-                name: "Tasks with issue",
+                name: "Issue",
                 count: res.has_issue,
                 color: BaseColor.greenColor,
                 legendFontColor: "#7F7F7F",
             },
-            {
-                name: "Tasks re-assigned",
-                count: res.re_assigned,
-                color: "#60505A",
-                legendFontColor: "#7F7F7F",
-            },
+
     
             {
-                name: "Tasks on progress",
+                name: "Processing",
                 count: res.processing,
                 color: BaseColor.pinkColor,
                 legendFontColor: "#7F7F7F",
             },
+
+            {
+                name: "Re-assigned",
+                count: res.re_assigned,
+                color: "#60505A",
+                legendFontColor: "#7F7F7F",
+            },
             
             {
-                name: "Completed tasks",
+                name: "Completed",
                 count: res.completed,
                 color: "#F4972F",
                 legendFontColor: "#7F7F7F",
@@ -106,7 +110,7 @@ export default function Entity() {
     const [inspectorStat, setInspectorStat] = useState(data)
     const role = "INSPECTOR"
     useEffect(()=>{
-
+        //gets the stats of tasks which are assigned by current user to others
         InspectionAPI.getInspectorStat({role})
         .then((res)=>{
             setStatdata(res, setInspectorStat)
@@ -155,6 +159,7 @@ export default function Entity() {
     },[])
 
     return (
+
         <SafeAreaView   
             style={[BaseStyle.safeAreaView, style.container]}
             forceInset={{ top: "always", bottom: "always"}}>
@@ -162,13 +167,10 @@ export default function Entity() {
 
             <PieChart data={inspectorStat}/>
 
-            <TouchableOpacity
-                style={{
-                    zIndex:10000
-                }}>
+            <TouchableOpacity>
                 <TextInput
                     onChangeText={filterCategory}
-                    style={{elevation:3}}
+                    style={{elevation:2}}
                     placeholder={"name, email"}
                     value={keyword}
                     keyboardType={null}
@@ -217,5 +219,6 @@ export default function Entity() {
             />
 
         </SafeAreaView>
+
     )
 }
