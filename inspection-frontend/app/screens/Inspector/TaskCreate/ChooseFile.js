@@ -73,7 +73,7 @@ const ChooseFile = ({ fileList, setFileList }) => {
 
             {fileList.map((item, index) => (
                 <FileAttachment
-                    style={{ paddingHorizontal: 0, justifyContent:"center" }}
+                    style={{ paddingHorizontal: 25, justifyContent:"center" }}
                     key={index}
                     {...FileChecker(item.mimeType)}
                     percent={item.percent}

@@ -13,7 +13,7 @@ import {
 } from "@components";
 import { BaseColor, BaseStyle, useTheme } from "@config";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import React, { useEffect, useRef, useState, useCallback, useMemo  } from "react";
+import React, { useEffect, useRef, useState, useMemo  } from "react";
 import { useTranslation } from "react-i18next";
 import {
     ScrollView,
@@ -314,7 +314,7 @@ const TaskView = () => {
                     );
                 }}
                 onPressRight={() => {
-                    navigation.navigate("TaskEdit", { item: item, fileList });
+                    navigation.navigate("TaskEdit", { item: item, fileList,todo });
                 }}
             />
             <View style={{ flex: 1 }}>
@@ -590,6 +590,7 @@ const TaskView = () => {
                                     setEditTodoData={setEditTodoData}
                                     status={item.status}
                                     title={item.title}
+                                    show={true}
                                     description={item.description}
                                 />
                             ))}

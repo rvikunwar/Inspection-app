@@ -17,9 +17,9 @@ class TasksAssignedv1API(APIView):
         user = request.user.id
         role = request.query_params.get('role')
         if role is not None and role == 'MANAGER':
-            manager = Manager.objects.get(id=user)
-            inspector = manager.inspector_allocated.filter().values_list('id')
-            task = TaskAssigned.objects.filter(assigned_by__in=inspector).order_by('-timestamp')
+            manager = Profile.objects.get(id=user)
+            entity = manager.entity
+            task = TaskAssigned.objects.filter(entity=entity).order_by('-timestamp')
             serializer = TaskAssignedSerializer(task, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -108,10 +108,8 @@ class FileUpload(APIView):
         serializer = FileSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            print((serializer.data))
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            print(serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -182,21 +180,6 @@ class InspectorTasksAPI(APIView):
             tasks = TaskAssigned.objects.filter(assigned_to=user, assigned_by=userv1).order_by('-timestamp')
             serializer = TaskAssignedSerializer(tasks, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response({}, status=status.HTTP_200_OK)
-
-
-class ManagerStat(APIView):
-    def get(self, request):
-        manager = request.query_params.get('manager', None)
-        if manager is not None:
-            manager = Manager.objects.get(id=manager)
-            inspectors = manager.inspector_allocated.filter().values_list('user')
-            inspector_count = len(inspectors)
-            tasks = TaskAssigned.objects.filter(assigned_by__in=inspectors)
-            task_count = len(tasks)
-            completed_task = TaskAssigned.objects.filter(assigned_by__in=inspectors, status="COMPLETED").count()
-            return Response({"inspector_count": inspector_count,
-                             "task_count": task_count, "completed_task": completed_task})
         return Response({}, status=status.HTTP_200_OK)
 
 

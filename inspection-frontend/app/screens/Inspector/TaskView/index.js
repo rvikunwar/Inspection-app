@@ -26,6 +26,8 @@ import { InspectionAPI} from "@connect/api";
 import { HOST_URL } from '@env'
 import LoadingDots from "react-native-loading-dots";
 import Attachment from './Attachment'
+import { useSelector } from "react-redux";
+
 
 
 const TaskView = () => {
@@ -37,6 +39,7 @@ const TaskView = () => {
     const [sortOption, setSortOption] = useState();
     const [ showAction, setShowAction ] = useState(false)
     const [ editTododata, setEditTodoData ] = useState()
+    const currentUser = useSelector((state)=> state.auth.user.user_id)
 
     let dotAction = [
         {
@@ -106,7 +109,6 @@ const TaskView = () => {
 
     const [item, setItem] = useState(defaultValues);
     const [ refreshv1, setRefreshv1 ] = useState(false)
-
 
     useEffect(() => {
         if (route?.params?.members) {
@@ -185,6 +187,7 @@ const TaskView = () => {
         if(isMounted && item.id!=null){
             InspectionAPI.getListofTodos(item.id).then((res)=>{
                 setTodo(res)
+                console.log("fetching todo related to task selected-successfull")
             }).catch((err)=>{
                 console.log(err)
             })
@@ -298,7 +301,7 @@ const TaskView = () => {
             edges={["right", "top", "left"]}
         >
             <Header
-                title={t("task_view")}
+                title={"Task view"}
                 renderLeft={() => {
                     return (
                         <Icon
@@ -346,6 +349,7 @@ const TaskView = () => {
                                 }
 
                                 </View>
+                                {item.assigned_by != currentUser &&
                                 <TouchableOpacity style={{
                                     zIndex:1000, 
                                     alignItems:"flex-end", 
@@ -353,10 +357,10 @@ const TaskView = () => {
                                       setOpenStatus(true)
                                 }}>
                                     <Icon name="ellipsis-v" size={14} />
-                                </TouchableOpacity>
+                                </TouchableOpacity>}
 
                             </View>
-                            <Text title3>{item.title}</Text>
+                            <Text body2>{item.title}</Text>
 
                             <Text body2 light style={{ paddingVertical: 0 }}>
                                 {item.description}
@@ -570,7 +574,7 @@ const TaskView = () => {
                                 </View>
                             </View>
                             
-                            {todo.map((item, index)=>(
+                            {todo.map((todoitem, index)=>(
                                 <CardCommentSimple
                                     key={index}
                                     style={{
@@ -578,13 +582,14 @@ const TaskView = () => {
                                         paddingHorizontal:4,
                                         borderColor: BaseColor.dividerColor,
                                     }}
-                                    item={item}
+                                    item={todoitem}
                                     showAction={showAction}
                                     setShowAction={setShowAction}
                                     setEditTodoData={setEditTodoData}
-                                    status={item.status}
-                                    title={item.title}
-                                    description={item.description}
+                                    status={todoitem.status}
+                                    title={todoitem.title}
+                                    description={todoitem.description}
+                                    show={currentUser === item.assigned_by}
                                 />
                             ))}
                         </View>

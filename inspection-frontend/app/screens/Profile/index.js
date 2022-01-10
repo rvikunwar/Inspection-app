@@ -32,6 +32,7 @@ const Profile = (props) => {
     const login = auth.login.isAuthenticated;
     const expo_token = auth.user.expo_token;
     const profile = auth.user;
+    const position = useSelector((state) => state.auth.user.position)
  
     const onLogOut = () => {
         InspectionAPI.removeExpoToken(expo_token).then(()=>{
@@ -104,12 +105,12 @@ const Profile = (props) => {
                         <View style={styles.viewFollow}>
                             <View style={{ flex: 3 }}>
                             <Tag primary style={styles.follow} styleText={{}}>
-                                {"Inspector"}
+                                {position}
                             </Tag>
                             </View>
 
                             <View style={{ flex: 5 }}>
-                                <ProfilePerformance data={performance}/>
+                               {position === 'INSPECTOR' && <ProfilePerformance data={performance}/>}
                             </View>
                         </View>
                   

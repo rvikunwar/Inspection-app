@@ -110,27 +110,6 @@ const EntityView = () => {
     },[itemv1?.person_in_charge])
 
 
-    //GET MANAGER STATS
-    const [ managerStat, setMnangerStat ] = useState({
-        completed_task:null,
-        inspector_count:null,
-        task_count:null
-    })
-    useEffect(()=>{
-
-        InspectionAPI.getManagerStat(manager)
-        .then((res)=>{
-            setMnangerStat({
-                ...managerStat,
-                ...res
-            })
-        }).
-        catch((err)=>{
-            console.log(err)
-        })
-
-    },[])
-
 
     //FILTERING   
     const [keyword, setKeyword] = useState("");
@@ -154,33 +133,33 @@ const EntityView = () => {
 
     const data = [
         {
-            name: "New tasks",
+            name: "New",
             count: 0,
             color: "#0E9CF5",
             legendFontColor: "#7F7F7F",
         },
         {
-            name: "Tasks with issue",
+            name: "Issue",
             count: 0,
             color: BaseColor.greenColor,
             legendFontColor: "#7F7F7F",
         },
         {
-            name: "Tasks re-assigned",
+            name: "Re-assigned",
             count: 0,
             color: "#60505A",
             legendFontColor: "#7F7F7F",
         },
     
         {
-            name: "Tasks on progress",
+            name: "Processing",
             count: 0,
             color: BaseColor.pinkColor,
             legendFontColor: "#0E9CF5",
         },
         
         {
-            name: "Completed tasks",
+            name: "Completed",
             count: 0,
             color: BaseColor.accent,
             legendFontColor: "#F4972F",
@@ -190,33 +169,33 @@ const EntityView = () => {
     const setStatdata = (res, setFunc) => {
         const data = [
             {
-                name: "New tasks",
+                name: "New",
                 count: res.new,
                 color: "#0E9CF5",
                 legendFontColor: "#7F7F7F",
             },
             {
-                name: "Tasks with issue",
+                name: "Issue",
                 count: res.has_issue,
                 color: BaseColor.greenColor,
                 legendFontColor: "#7F7F7F",
             },
             {
-                name: "Tasks re-assigned",
+                name: "Re-assigned",
                 count: res.re_assigned,
                 color: "#60505A",
                 legendFontColor: "#7F7F7F",
             },
     
             {
-                name: "Tasks on progress",
+                name: "Processing",
                 count: res.processing,
                 color: BaseColor.pinkColor,
                 legendFontColor: "#7F7F7F",
             },
             
             {
-                name: "Completed tasks",
+                name: "Completed",
                 count: res.completed,
                 color: "#F4972F",
                 legendFontColor: "#7F7F7F",
@@ -469,27 +448,14 @@ const EntityView = () => {
 
                     </View>
 
-
-                        {/* <CardReport04
-                            style={{ marginBottom: 7, marginTop:10 }}
-                            icon="chart-bar"
-                            title="Tasks & inspectors stats"
-                            subTitle1={`Total inspectors: ${managerStat.inspector_count}`}
-                            subTitle2={`Total tasks: ${managerStat.task_count}`}
-                            subTitle3={`Total tasks completed: ${managerStat.task_count}`}
-
-                            percent1="68%"
-                            percent2="50%"
-                            percent3="90%"
-
-                        /> */}
                     </View>
                 </View>
 
                 <View>
                     <TouchableOpacity
                         style={{
-                            zIndex:10000
+                            zIndex:10000,
+                            paddingHorizontal:7
                         }}
                         onPress={()=>{
                             navigation.navigate('InspectorListView', {inspectors, itemv1})
@@ -516,16 +482,16 @@ const EntityView = () => {
                             }
                         />
                     </TouchableOpacity>
-                    <FlatList
-                        data={inspectors}
-                        keyExtractor={(item, index) => item.id}
-                        renderItem={({ item, index }) => (
-                            <ListTextButton
+
+                    {inspectors.map((item, index)=>(
+
+                        <ListTextButton
+                            key={index}
                             image={{uri:`${HOST_URL}${item.profile_image}`}}
                             name={item.first_name +" "+ item.last_name}
                             description={item?.email}
                             online={item.online}
-                            style={{marginTop: 7}}
+                            style={{marginTop: 7, paddingHorizontal:14}}
                             onPress={() => {
                                 navigation.navigate("InspectorProfile",{ inspector: item, department: itemv1 });
                             }}
@@ -542,8 +508,8 @@ const EntityView = () => {
                                 </Tag>
                             }
                         />
-                        )}
-                    />
+                    ))}
+
                 </View>
             </ScrollView>
 

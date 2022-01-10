@@ -24,6 +24,16 @@ import { store } from 'app/store'
 import FlashMessage from "react-native-flash-message";
 import { AuthActions } from '@actions'
 import * as Location from 'expo-location';
+import * as Notifications from 'expo-notifications';
+
+
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: false,
+        shouldSetBadge: false
+    })
+});
 
 
 const { notiMsgCount } = AuthActions;
@@ -135,6 +145,42 @@ const Navigation = () => {
 
     const { countNotification } = NotificationActions
     const font = useFont();
+    const expoToken =  useSelector((state) =>  state.auth.user.expo_token)
+    const [notification, setNotification] = useState();
+    const notificationListener = useRef();
+    const responseListener = useRef();
+
+    
+
+    useEffect(()=>{
+        notificationListener.current = Notifications.addNotificationReceivedListener(setNotification);
+
+        responseListener.current = Notifications.addNotificationResponseReceivedListener(
+            (response) => {
+                // console.log(response, 'sjss')
+                setNotification(response.notification);
+            }
+        );
+
+        // Notifications.setNotificationCategoryAsync({
+        //     identifier: 'download',
+        //     actions: [{  
+        //         identifier: 'openFile',
+        //         buttonTitle: 'ssssssss',
+        //         textInput: {
+        //           submitButtonTitle:'sss',
+        //           placeholder:'ssss',
+        //         }
+        //     }]
+        // })
+
+        return () => {
+            notificationListener.current &&
+                Notifications.removeNotificationSubscription(notificationListener.current);
+            responseListener.current &&
+                Notifications.removeNotificationSubscription(responseListener.current);
+        };
+    },[])
 
 
     useEffect(() => {

@@ -15,7 +15,7 @@ export const dateformat = (timestamp) => {
 export const backendDateFormat = (timestamp) => {
   let date= new Date(timestamp)
 
-  let time = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+  let time = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
 
   return time
 }

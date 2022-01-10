@@ -109,33 +109,33 @@ const InsProfileView = () => {
 
    const data = [
     {
-        name: "New tasks",
+        name: "New",
         count: 0,
         color: "#0E9CF5",
         legendFontColor: "#7F7F7F",
     },
     {
-        name: "Tasks with issue",
+        name: "Issue",
         count: 0,
         color: BaseColor.greenColor,
         legendFontColor: "#7F7F7F",
     },
     {
-        name: "Tasks re-assigned",
+        name: "Re-assigned",
         count: 0,
         color: "#60505A",
         legendFontColor: "#7F7F7F",
     },
 
     {
-        name: "Tasks on progress",
+        name: "Processing",
         count: 0,
         color: BaseColor.pinkColor,
         legendFontColor: "#0E9CF5",
     },
     
     {
-        name: "Completed tasks",
+        name: "Completed",
         count: 0,
         color: BaseColor.accent,
         legendFontColor: "#F4972F",
@@ -148,33 +148,33 @@ const InsProfileView = () => {
     const setStatdata = (res, setFunc) => {
         const data = [
             {
-                name: "New tasks",
+                name: "New",
                 count: res.new,
                 color: "#0E9CF5",
                 legendFontColor: "#7F7F7F",
             },
             {
-                name: "Tasks with issue",
+                name: "Issue",
                 count: res.has_issue,
                 color: BaseColor.greenColor,
                 legendFontColor: "#7F7F7F",
             },
             {
-                name: "Tasks re-assigned",
+                name: "Re-assigned",
                 count: res.re_assigned,
                 color: "#60505A",
                 legendFontColor: "#7F7F7F",
             },
     
             {
-                name: "Tasks on progress",
+                name: "Processing",
                 count: res.processing,
                 color: BaseColor.pinkColor,
                 legendFontColor: "#7F7F7F",
             },
             
             {
-                name: "Completed tasks",
+                name: "Completed",
                 count: res.completed,
                 color: "#F4972F",
                 legendFontColor: "#7F7F7F",
@@ -207,6 +207,17 @@ const InsProfileView = () => {
        }
  
    },[inspector.user])
+
+   const [ taskListing , setTaskListing ] = useState([])
+   useEffect(()=>{
+       if(selectT === 0){
+        setTaskListing(fromTasks.to)
+       } else {
+        setTaskListing(fromTasks.from)
+       }
+
+   },[selectT, fromTasks])
+
 
 
 
@@ -368,11 +379,9 @@ const InsProfileView = () => {
                         borderColor: colors.border,
                         }}>
                         <Text headline>Allocated areas</Text>
-                        <FlatList
-                            data={Areas}
-                            keyExtractor={(item, index) => item.id}
-                            renderItem={({ item, index }) => (
-                                <View style={{
+                        {Areas.map((item, index)=>(
+                                <View
+                                    key={index} style={{
                                     flexDirection:"row", 
                                     alignItems:"center",
                                     marginTop: 10,
@@ -386,8 +395,7 @@ const InsProfileView = () => {
                                         marginRight:10}}/>
                                     <Text footnote light style={{ color:"gray"}}>{item.name}</Text>
                                 </View>
-                            )}
-                        />
+                            ))}
                     </View>
                     <View style={{ 
                             borderWidth:1,
@@ -431,19 +439,18 @@ const InsProfileView = () => {
                                     right: 5
                             }]} 
                             onPress={()=>{
-                             navigation.navigate("Messages",{ selectedUser: inspector.user, 
-                                selectedUser_image: `${HOST_URL}${inspector.profile_image}`, 
-                                profile: inspector });
+                             navigation.navigate("Messages",{ selectedUser: inspector });
                             }}>
                             <Icon name="facebook-messenger" size={23} solid style={{color: colors.primary }}/>    
                         </TouchableOpacity> 
                     </View>
                 </View>
 
-                <View style={{ marginTop:30, marginVertical:10 }}>
+                <View style={{ marginTop:30 }}>
                     <View style={{
                         flexDirection:"row", 
-                        justifyContent:"space-around",}}>
+                        justifyContent:"space-around",
+                        marginBottom:10}}>
                         <Button style={{
                             width:160, 
                             marginRight:20,
@@ -472,15 +479,14 @@ const InsProfileView = () => {
                                     TASK ASSIGNED TO {inspector.first_name.toUpperCase()}</Text>
                         </Button>
                     </View>
-                    <FlatList
-                        data={selectT === 0? fromTasks?.to: fromTasks?.from}
-                        keyExtractor={(item, index) => item.id}
-                        renderItem={({ item, index }) => (
-                            <TouchableOpacity
+  
+                    {taskListing.map((item, index)=>(
+                        <TouchableOpacity
+                                key={index}
                                 style={[styles.contain, {
                                     borderWidth:1,
                                     borderRadius: 8,
-                                    marginBottom: 0,
+                                    marginBottom: 10,
                                     padding:10,
                                     marginTop:10,
                                     borderWidth: StyleSheet.hairlineWidth,
@@ -500,36 +506,37 @@ const InsProfileView = () => {
                                 }]}
                                 onPress={()=>{
                                         navigation.navigate("TaskView", { item: item });
-                                               
+                                            
                                 }}
                                 activeOpacity={0.9}
                                 >
                                 <View style={{ paddingHorizontal: 10 }}>
                                     <View style={{flexDirection:"row", justifyContent:"space-between"}}>
                                         <Text headline semibold style={{width:"70%"}}>
-                                        {item.title}
+                                            {item.title}
                                         </Text>
-                                        <Tag
-                                            light
-                                            textStyle={{
-                                                color: BaseColor.whiteColor,
-                                            }}
-                                            style={{
-                                                backgroundColor: statusColor(item.status),
-                                                paddingHorizontal: 10,
-                                                minWidth: 80,
-                                                height:22
-                                            }}>
-                                            {item.status}
-                                        </Tag>
-                                    </View>
-                                    <Text footnote semibold grayColor style={{ marginTop: 5 }}>
-                                    {item.description.substring(0,100)} . . .
-                                    </Text>
+                                    <Tag
+                                        light
+                                        textStyle={{
+                                            color: BaseColor.whiteColor,
+                                        }}
+                                        style={{
+                                            backgroundColor: statusColor(item.status),
+                                            paddingHorizontal: 10,
+                                            minWidth: 80,
+                                            height:22
+                                        }}>
+                                        {item.status}
+                                    </Tag>
                                 </View>
-                                </TouchableOpacity>
-                        )}
-                    />
+                                <Text footnote grayColor style={{ marginTop: 5, fontSize:15 }}>
+                                {item.description.substring(0,200)} . . .
+                                </Text>
+                            </View>
+                        </TouchableOpacity>
+                    ))}
+
+                   
                     {(selectT === 0 && fromTasks?.to.length===0 )&&
                     <View style={{
                         flex:1, 

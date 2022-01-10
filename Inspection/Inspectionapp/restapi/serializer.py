@@ -25,7 +25,7 @@ class FileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Files
-        fields = ('id', 'task', 'file', 'type')
+        fields = ('id', 'task', 'file')
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)

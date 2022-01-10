@@ -93,7 +93,7 @@ const ModalOption = (props) => {
                                         : StyleSheet.hairlineWidth,
                             },
                         ]}
-                        key={item.value}
+                        key={index}
                         onPress={() => onSelect(item)}
                     >
                         <View

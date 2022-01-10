@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { ListTextButton, Tag, TextInput, Icon, Header } from '@components'
+import { ListTextButton, Tag, TextInput, Icon, Header, SafeAreaView } from '@components'
 import { View, FlatList, TouchableOpacity } from 'react-native'
-import { useTheme, BaseColor } from "@config";
 import {HOST_URL} from "@env"
 import { haveChildren } from "@utils";
+import { BaseColor, BaseStyle, useTheme} from "@config";
 
 
 export default function InsListView(props) {
@@ -34,59 +34,75 @@ export default function InsListView(props) {
     };
 
     return (
-        <View style={{
-            padding:10,
-            paddingTop:30,
-            paddingHorizontal:25
-        }}>
-            <Header title="INSPECTORS"/>
-
-            <TextInput
-                onChangeText={filterCategory}
-                autoFocus
-                style={{elevation:0}}
-                placeholder={"name, username or email"}
-                value={keyword}
-                icon={
-                    <TouchableOpacity onPress={() => filterCategory("")}>
+        <SafeAreaView   
+            style={[BaseStyle.safeAreaView]}
+            forceInset={{ top: "always", bottom: "always" }}
+            >
+            <Header 
+                title="INSPECTORS"
+                renderLeft={() => {
+                    return (
                         <Icon
-                            name="times"
-                            size={16}
-                            color={BaseColor.grayColor}
+                            name="angle-left"
+                            size={20}
+                            color={colors.primary}
+                            enableRTL={true}
                         />
-                    </TouchableOpacity>
-                }
-            />
-            <FlatList
-                data={inspectorsv1}
-                keyExtractor={(item, index) => item.id}               
-                showsVerticalScrollIndicator={false}
-                showsHorizontalScrollIndicator={false}
-                renderItem={({ item, index }) => (
-                    <ListTextButton
-                        image={{uri:`${HOST_URL}${item.profile_image}`}}
-                        name={item.first_name +" "+ item.last_name}
-                        description={item?.email}
-                        online={item.online}
-                        style={{marginTop: 7}}
-                        onPress={() => {
-                            navigation.navigate("InspectorProfile",{ inspector: item, department: itemv1 });
-                        }}
-                    componentRight={
-                        <Tag
-                            
-                            outline
-                            style={{
-                                paddingHorizontal: 20,
-                                backgroundColor: colors.background,
-                            }}
-                        >
-                            {`${"check"}`}
-                        </Tag>
+                    );
+                }}
+                onPressLeft={() => {
+                    navigation.goBack();
+                }}/>
+            <View style={{
+                    paddingHorizontal: 21
+                }}>
+                <TextInput
+                    onChangeText={filterCategory}
+                    autoFocus
+                    style={{elevation:3}}
+                    placeholder={"name, username or email"}
+                    value={keyword}
+                    icon={
+                        <TouchableOpacity onPress={() => filterCategory("")}>
+                            <Icon
+                                name="times"
+                                size={16}
+                                color={BaseColor.grayColor}
+                            />
+                        </TouchableOpacity>
                     }
                 />
-                )}
-            />
-        </View>
+                <FlatList
+                    data={inspectorsv1}
+                    keyExtractor={(item, index) => item.id}               
+                    showsVerticalScrollIndicator={false}
+                    showsHorizontalScrollIndicator={false}
+                    renderItem={({ item, index }) => (
+                        <ListTextButton
+                            image={{uri:`${HOST_URL}${item.profile_image}`}}
+                            name={item.first_name +" "+ item.last_name}
+                            description={item?.email}
+                            online={item.online}
+                            style={{marginTop: 7}}
+                            onPress={() => {
+                                navigation.navigate("InspectorProfile",{ inspector: item, department: itemv1 });
+                            }}
+                        componentRight={
+                            <Tag
+                                
+                                outline
+                                style={{
+                                    paddingHorizontal: 20,
+                                    backgroundColor: colors.background,
+                                }}
+                            >
+                                {`${"check"}`}
+                            </Tag>
+                        }
+                    />
+                    )}
+                />
+            </View>
+        </SafeAreaView>
     )
 }

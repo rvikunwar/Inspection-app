@@ -12,4 +12,8 @@ export { default as Calendar  } from "./Calendar";
 //Files
 export { default as FileAttachment  } from "./FileAttachment";
 
+//loader 
+export { default as Loader } from './Loader'
 
+//datepicker
+export { default as DatePicker } from './DatePicker'

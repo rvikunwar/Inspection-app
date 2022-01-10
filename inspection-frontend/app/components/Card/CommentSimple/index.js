@@ -14,9 +14,8 @@ import { InspectionAPI } from "../../../connect/api";
 
 export default function CardCommentSimple(props) {
     const { colors } = useTheme();
-    const { style, title, date,status, description, item, 
+    const { style, title, date,status, description, item, show,
         showAction, setShowAction, setEditTodoData, onAction = () => {} } = props;
-
     
     const [ openTodoStatus, setOpenTodoStatus] = useState(false)
     const [ statusv1, setStatus ] = useState({text:status})
@@ -93,11 +92,12 @@ export default function CardCommentSimple(props) {
                         borderRadius: 5, alignContent:"center", justifyContent:"center"}}>
                         <Text style={{ color: 'white', fontSize:12}}>{statusv1.text}</Text>
                     </View>
+                    {!show &&
                     <TouchableOpacity style={{  width:20, alignItems:"flex-end"}} onPress={() => { 
                         setOpenTodoStatus(true)
                         }}>
                         <Icon name="ellipsis-v" size={14} />
-                    </TouchableOpacity>
+                    </TouchableOpacity>}
                 </View>
             </View>
             <View>

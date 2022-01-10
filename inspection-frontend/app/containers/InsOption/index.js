@@ -97,7 +97,7 @@ const InspectorOption = (props) => {
                                         : StyleSheet.hairlineWidth,
                             },
                         ]}
-                        key={item.value}
+                        key={index}
                         onPress={() => onSelect(item)}
                     >
                         

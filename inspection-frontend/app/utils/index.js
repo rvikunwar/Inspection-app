@@ -11,7 +11,6 @@ import { Alert, Platform } from 'react-native'
 import { Linking } from 'expo';
 import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
-import * as Location from 'expo-location';
 
   
 const scaleValue = PixelRatio.get() / 2;

@@ -94,13 +94,13 @@ const Messenger = () => {
             setPage(1)
             InspectionAPI.getMessengerDetails(page).then((res)=>{
                 setMessengerList([...res.results ])
+                setLoader(false)
                 setMessengerListv1([...res.results ])
                 if(res.next === null){
                     setMore(false)
                 } else {
                     setMore(true)
                 }
-                setLoader(false)
             }).catch((err)=>{
                 console.log(err),
                 setLoader(false)

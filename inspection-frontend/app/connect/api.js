@@ -76,7 +76,6 @@ export const endPoints = {
     entity: (id) => `inspectionapp/entity/${id}/`,
     todostats: 'inspectionapp/todostats/',
     inspectortasks: 'inspectionapp/inspectortasks/',
-    managerstat: 'inspectionapp/managerstat/',
     inspectorstat: 'inspectionapp/inspectorstat/',
     areastat: 'inspectionapp/areastat/',
     updatestatus:'inspectionapp/updatestatus/',
@@ -176,11 +175,6 @@ export const InspectionAPI = {
     
     //delete task
     deleteTaskData: (id) => requests.del(`${BASE_URL}/${endPoints.taskAssignedv2(id)}`),
-
-    //manager stats
-    getManagerStat: (manager) => UserAxios.get(`${BASE_URL}/${endPoints.managerstat}`,{
-            params:{manager}
-        }).then(responseBody),
 
     //manager stats
     getInspectorStat: ({role,inspector,entity}) => UserAxios.get(`${BASE_URL}/${endPoints.inspectorstat}`,{

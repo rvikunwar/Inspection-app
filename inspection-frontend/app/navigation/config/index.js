@@ -46,16 +46,6 @@ export const ManagerTabScreens = {
         },   
     },
 
-    Notifications: {
-        component:Notifications,
-        options: {
-            title: "Notifications",
-            headerShown:false,
-            tabBarIcon: ({ color }) =>  {                
-                return tabBarIconHaveNoty({ countFunc: getNotificationCount, color, name: "facebook-messenger" })},
-        },   
-    },
-
     Profile: {
         component:Profile,
         options: {

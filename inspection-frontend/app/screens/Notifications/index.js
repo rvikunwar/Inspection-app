@@ -10,7 +10,7 @@ import styles from "./styles";
 import { HOST_URL } from '@env'
 import { InspectionAPI } from "@connect/api";
 import { renderTimestamp } from '@common'
-import { updateNotificationCountToZero,  updateNotificationSeenStatus } from '../../socket/socketfunc'
+import { updateNotificationCountToZero,  updateNotificationSeenStatus } from '@socket/socketfunc'
 import { useIsFocused } from "@react-navigation/core";
 import { useDispatch, useSelector } from "react-redux";
 import { NotificationActions } from "@actions";

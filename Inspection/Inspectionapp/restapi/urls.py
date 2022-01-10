@@ -15,7 +15,6 @@ urlpatterns = [
     path('areas/', AreaAPI.as_view(), name="area"),
     path('todostats/', TodoStats.as_view(), name="todo-stats"),
     path('inspectortasks/', InspectorTasksAPI.as_view(), name="ins-tasks"),
-    path('managerstat/', ManagerStat.as_view(), name="manager-stat"),
     path('inspectorstat/', InspectorStat.as_view(), name="inspector-stat"),
     path('areastat/', AreaStat.as_view(), name="area-stat"),
     path('updatestatus/', UpdateStatus.as_view(), name="update-status"),

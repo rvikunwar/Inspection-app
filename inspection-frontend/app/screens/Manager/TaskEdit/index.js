@@ -1,5 +1,4 @@
 import {
-    FormDoubleSelectOption,
     Header,
     Icon,
     SafeAreaView,
@@ -13,7 +12,7 @@ import { BaseColor, BaseStyle, useTheme } from "@config";
 import { useNavigation, useRoute } from "@react-navigation/core";
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { ScrollView, View, TouchableOpacity } from "react-native";
+import { ScrollView, View, TouchableOpacity, Touchable } from "react-native";
 import styles from "./styles";
 import { InspectionAPI } from "@connect/api";
 import { backendDateFormat } from '@common'
@@ -22,7 +21,9 @@ import { HOST_URL } from "@env"
 import LoadingDots from "react-native-loading-dots";
 import { InsOption, Calendar } from '@container'
 import ChooseFile from './ChooseFile'
-
+import * as Progress from 'react-native-progress';
+import { showMessage } from "react-native-flash-message";
+import { DatePicker } from '@container'
 
 const TaskEdit = (props) => {
 
@@ -31,6 +32,7 @@ const TaskEdit = (props) => {
     const [headerName, setHeaderName] = useState(t("Create task"));
     const navigation = useNavigation();
     const route = useRoute();
+
 
     const TaskPriority = [
         {
@@ -91,6 +93,8 @@ const TaskEdit = (props) => {
     const [ openStatus, setOpenStatus] = useState(false)
     const [ insVisible, setinsVisible ] = useState(false)
     const [ modalData, setModalData ] = useState("by")
+    const [ loader, setLoader ] = useState(false)
+
 
     const defaultValues = {
         id: null,
@@ -104,8 +108,11 @@ const TaskEdit = (props) => {
         reason_for_reassigning:null
     }
 
+
     const [ formdata, setFormdata ] = useState(defaultValues)
     const [ fileList, setFileList ] = useState([])
+    const [ todo, setTodo ] = useState(route?.params?.todo)
+
 
     useEffect(()=>{
         if(route?.params?.fileList){
@@ -136,6 +143,8 @@ const TaskEdit = (props) => {
         }
     }, [route?.params?.item]);
 
+    const [ datev1, setDatev1 ] = useState(route?.params?.item.end_date)
+
     /**
      * @description for assigning entity id and assign to
      */
@@ -156,28 +165,66 @@ const TaskEdit = (props) => {
     //FOR UPDATING AND POSTING TASK
     const submitFormHandler = () => {
         if(formdata.id){
+            setLoader(true)
             InspectionAPI.updateTaskData(formdata, formdata.id).then((res)=>{
-                
                     setFormdata(defaultValues)
+                    if(todo.length>0){
+                        putTodo(res.id,()=>{
+             
+                            showMessage({
+                                message: 'Task successfully submitted',
+                                type: "success",
+                              });
+                              navigation.navigate('TaskView',{'taskdata': res})
+                              setFormdata(defaultValues)
+                              setLoader(false)
+                              setFileList([])
+                              setTodo([])
 
-                    navigation.navigate('TaskView',{'taskdata': res})
-                
+                            }) 
+                    } else {
+                        setFormdata(defaultValues)
+                        navigation.navigate('TaskView',{'taskdata': res})
+                        setLoader(false)
+                        setFileList([])
+                        setTodo([])
+                        showMessage({
+                            message: 'Task successfully submitted',
+                            type: "success",
+                          });
+
+                    }
             }).catch((err)=>{
-                console.log(err)
+                console.log(err, 'task error')
+                showMessage({
+                    message: 'Something went wrong, please check',
+                    type: "error",
+                  });
+                setLoader(false)
             })
         }
-        else{
-            InspectionAPI.postTask(formdata).then((res)=>{
-               
-                    setFormdata(defaultValues)
+    }
 
-                    navigation.navigate('TaskView', {item: res})
-                
-                
-            }).catch((err)=>{
-                console.log(err)
+    const putTodo = (task, callback) => {
+        let data;
+        todo.map((item, index)=>{
+            data = item
+            data['task']=task
+            InspectionAPI.updateTodoData(data, data.id)
+            .then((res)=>{
+                if(index === todo.length-1){
+                    callback()
+                }
             })
-        }
+            .catch((err)=>{
+                console.log(err, 'update todo -error')
+                showMessage({
+                    message: 'Something went wrong, please check',
+                    type: "error",
+                  });
+                setLoader(false)
+            })
+        })
     }
 
  
@@ -214,9 +261,7 @@ const TaskEdit = (props) => {
         }
    },[inspectors, formdata])
       
-   
-
- 
+   const [show, setShow] = useState(false);
 
     return (
         <SafeAreaView
@@ -317,21 +362,28 @@ const TaskEdit = (props) => {
                     <Text headline style={styles.title}>
                         {"Schedule end day"}
                     </Text>
-
-                    <Calendar 
-                        style={{
-                            backgroundColor :"rgba(0,0,0,0.06)",
-                            paddingHorizontal:10,
-                            paddingVertical:5,
-                            borderRadius:7
+                    <TouchableOpacity style={{
+                            width:'100%'
                         }}
-                        day={formdata.end_date}
-                        onChange={(date)=>{
+                        onPress={()=>{
+                            setShow(true)
+                        }}>
+                        <Text>
+                            {backendDateFormat(datev1)}
+                        </Text>
+                    </TouchableOpacity>
+                    <DatePicker
+                        show={show}
+                        setShow={setShow}
+                        day={`${datev1}`}
+                        onChangev1={(date)=>{
+                            setDatev1(date)
                             setFormdata({
                                 ...formdata,
-                                "end_date": date
+                                "end_date": backendDateFormat(date)
                             })
-                        }}/>
+                        }}
+                    />
                     <Text headline style={styles.title}>
                         {t("Other")}
                     </Text>
@@ -399,15 +451,59 @@ const TaskEdit = (props) => {
 
                  
                     </View>
+                    
+                    <Text headline style={styles.title}>
+                        {"Todo's"}
+                    </Text>
 
-                        <View>
-                            <Text
-                                headline
-                                style={{ paddingHorizontal: 4, marginTop:30, fontSize: 21 }}>
-                                {"Evidence files"}
+                    {todo.map((item,index)=>(
+                        <View key={index}>
+                            <Text headline semibold style={{marginVertical:10}}>
+                                {`Title of todo (${index+1})`}
                             </Text>
-                            <ChooseFile fileList={fileList} setFileList={setFileList} task={formdata.id}/>
+                            <TextInput
+                                style={[BaseStyle.textInput]}
+                                onChangeText={(text) => {
+                                    let data = [ ...todo ]
+                                    data[index]['title']=text
+                                    setTodo(data)
+                                }}
+                                autoCorrect={false}
+                                placeholder={"Describe your todo"}
+                                placeholderTextColor={BaseColor.grayColor}
+                                value={item.title}
+                            />
+                            <Text headline semibold style={{marginVertical:10}}>
+                                {`description (${index+1})`}
+                            </Text>
+                            <TextInput
+                                style={[
+                                    BaseStyle.textInput,
+                                    { marginTop: 0, height: 120 },
+                                ]}
+                                onChangeText={(text) => {
+                                    let data = [ ...todo ]
+                                    data[index]['description']=text
+                                    setTodo(data)
+                                }}
+                                textAlignVertical="top"
+                                multiline={true}
+                                autoCorrect={false}
+                                placeholder={"Description for todo"}
+                                placeholderTextColor={BaseColor.grayColor}
+                                value={item.description}
+                            />
                         </View>
+                    ))}
+
+                    <View>
+                        <Text
+                            headline
+                            style={{ paddingHorizontal: 4, marginTop:30, fontSize: 21 }}>
+                            {"Evidence files"}
+                        </Text>
+                        <ChooseFile fileList={fileList} setFileList={setFileList} task={formdata.id}/>
+                    </View>
         
 
                 </View>
@@ -467,6 +563,24 @@ const TaskEdit = (props) => {
                     setinsVisible(false);
                 }}
             />
+
+            {loader &&
+                <View style={{
+                    position:'absolute',
+                    top:0,
+                    flex:1,
+                    width:'100%',
+                    backgroundColor:"rgba(0,0,0,0.4)",
+                    alignItems:'center',
+                    justifyContent:'center',
+                    height:'100%'}}>
+                    <Progress.Circle 
+                        size={49} 
+                        color={colors.primary}
+                        indeterminate={true}
+                        borderWidth= {3}/>
+                </View>
+            }
         </SafeAreaView>
     );
 };

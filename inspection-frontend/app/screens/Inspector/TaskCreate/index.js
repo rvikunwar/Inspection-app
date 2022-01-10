@@ -18,12 +18,15 @@ import { BaseColor, BaseStyle, useTheme, Images } from "@config";
 import { useNavigation, useRoute } from "@react-navigation/core";
 import React, { Fragment, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { FlatList, ScrollView, View } from "react-native";
+import { FlatList, ScrollView, View, TouchableOpacity } from "react-native";
 import styles from "./styles";
 import { InspectionAPI } from "@connect/api";
 import { backendDateFormat } from '@common'
 import ChooseFile from "./ChooseFile";
 import {  sendNotificationHandler } from '../../../socket/socketfunc'
+import * as Progress from 'react-native-progress';
+import { showMessage } from "react-native-flash-message";
+import { DatePicker } from '@container'
 
 
 const TaskCreate = (props) => {
@@ -36,7 +39,7 @@ const TaskCreate = (props) => {
     const profile = route?.params?.profile
     const department = route?.params?.department
     const area = route?.params?.area
-
+    const [ loader, setLoader ] = useState(false)
 
 
     const TaskPriority = [
@@ -120,30 +123,53 @@ const TaskCreate = (props) => {
         if(formdata.title){
             notifictaionHandler(formdata.title)
         }
+        setLoader(true)
         InspectionAPI.postTask(formdata).then((res)=>{
 
             if(fileList.length>0){
                 uploadFiles(res.id,()=>{
                     setFormdata(defaultValues)
-
+                    setLoader(false)
+                    setFileList([])
+                    setTodo([])
+                    showMessage({
+                        message: 'Task successfully submitted',
+                        type: "success",
+                      });
                     navigation.navigate('TaskView', {item: res, fileList:fileList})
                 })
             } else{
                 if(todo.length>0){
                     postTodo(res.id,()=>{
                         setFormdata(defaultValues)
-    
+                        setLoader(false)
+                        setFileList([])
+                        setTodo([])
+                        showMessage({
+                            message: 'Task successfully submitted',
+                            type: "success",
+                          });
                         navigation.navigate('TaskView', {item: res, fileList:fileList})
                     }) 
                 }
                 else{
                     setFormdata(defaultValues)
+                    setLoader(false)
+                    showMessage({
+                        message: 'Task successfully submitted',
+                        type: "success",
+                      });
                     navigation.navigate('TaskView', {item: res})
                 }
             }
             
         }).catch((err)=>{
-            console.log(err)
+            console.log(err, 'task error')
+            showMessage({
+                message: 'Something went wrong, please check',
+                type: "error",
+              });
+            setLoader(false)
         })
     }
 
@@ -153,7 +179,7 @@ const TaskCreate = (props) => {
 
     const uploadFiles = (task, callback) => {
         
-        fileList.map((item)=>{
+        fileList.map((item, index)=>{
             const form = new FormData();
             form.append('task', task);
             form.append('file', {
@@ -164,9 +190,27 @@ const TaskCreate = (props) => {
                      : item.file.uri,
             });
             InspectionAPI.uploadFile(form)
+            .then((res)=>{
+                if(index === fileList.length-1){
+                    if(todo.length == 0){
+                        callback()
+                    } else {
+                        postTodo(task,callback)
+                    }
+                }
+            }).catch((err)=>{
+                setLoader(false)
+
+                console.log(err, 'file upload')
+                showMessage({
+                    message: 'Something went wrong, please check',
+                    type: "error",
+                  });
+            })
         })
-        postTodo(task,callback)
+
     }
+
 
     const defaultTodo = {
         title: "",
@@ -188,13 +232,22 @@ const TaskCreate = (props) => {
             data['task']=task
             InspectionAPI.postTodoData(data)
             .then((res)=>{
-                callback()
+                if(index === todo.length-1){
+                    callback()
+                }
             })
             .catch((err)=>{
-                console.log(err)
+                console.log(err, 'todo -error')
+                showMessage({
+                    message: 'Something went wrong, please check',
+                    type: "error",
+                  });
+                setLoader(false)
             })
         })
     }
+
+    const [show, setShow] = useState(false);
 
     return (
         <SafeAreaView
@@ -219,7 +272,7 @@ const TaskCreate = (props) => {
                 renderRight={() => {
                     return (
                         <Text headline primaryColor>
-                            {t("save")}
+                            {"save"}
                         </Text>
                     );
                 }}
@@ -273,11 +326,27 @@ const TaskCreate = (props) => {
                     <Text headline style={styles.title}>
                         {t("schedule")}
                     </Text>
-                    <FormDoubleSelectOption
-                        formdata={formdata}
-                        setFormdata={setFormdata}
-                        titleLeft={t("start_date")}
-                        titleRight={t("end_date")}
+                    <TouchableOpacity style={{
+                            width:'100%'
+                        }}
+                        onPress={()=>{
+                            setShow(true)
+                        }}>
+                        <Text>
+                            {backendDateFormat(formdata.end_date)}
+                        </Text>
+                    </TouchableOpacity>
+                    <DatePicker
+                        show={show}
+                        new1={true}
+                        setShow={setShow}
+                        day={`${new Date()}`}
+                        onChangev1={(date)=>{
+                            setFormdata({
+                                ...formdata,
+                                "end_date": backendDateFormat(date)
+                            })
+                        }}
                     />
                     <Text headline style={styles.title}>
                         {t("Other")}
@@ -307,12 +376,12 @@ const TaskCreate = (props) => {
                                 onPress={()=>{
                                     addNewRow()
                                 }}>
-                                <Text footnote whiteColor>Add more todo</Text></Button>
+                                <Text footnote whiteColor>Add todo's</Text></Button>
                     </View>
             
 
                 {todo.map((item,index)=>(
-                     <>
+                     <View key={index}>
                         <Text headline semibold style={{marginVertical:10}}>
                             {`Title of todo (${index+1})`}
                         </Text>
@@ -348,7 +417,7 @@ const TaskCreate = (props) => {
                             placeholderTextColor={BaseColor.grayColor}
                             value={item.description}
                         />
-                     </>
+                     </View>
                 ))}
                 </View>
 
@@ -373,6 +442,23 @@ const TaskCreate = (props) => {
                     setOpenPriority(false);
                 }}
             />
+            {loader &&
+                <View style={{
+                    position:'absolute',
+                    top:0,
+                    flex:1,
+                    width:'100%',
+                    backgroundColor:"rgba(0,0,0,0.4)",
+                    alignItems:'center',
+                    justifyContent:'center',
+                    height:'100%'}}>
+                    <Progress.Circle 
+                        size={49} 
+                        color={colors.primary}
+                        indeterminate={true}
+                        borderWidth= {3}/>
+                </View>
+            }
         </SafeAreaView>
     );
 };
