@@ -19,5 +19,4 @@ urlpatterns = [
     path('areastat/', AreaStat.as_view(), name="area-stat"),
     path('updatestatus/', UpdateStatus.as_view(), name="update-status"),
     path('updatetodostatus/', UpdateTodoStatus.as_view(), name="update-todo-status")
-
 ]

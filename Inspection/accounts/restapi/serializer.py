@@ -21,3 +21,9 @@ class ChangePasswordSerializer(serializers.Serializer):
     """
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True, min_length=8)
+
+
+class ManagerProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ['id', 'user', 'first_name', 'last_name', 'profile_image', 'email', 'position', 'online']

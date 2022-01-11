@@ -87,7 +87,8 @@ export const endPoints = {
     changePassword: 'accounts/change-password/',
     messengerList: 'chats/messengerList',
     getNotification: 'notification/fetch/',
-    fetchmessages: 'chats/fetchmessages/'
+    fetchmessages: 'chats/fetchmessages/',
+    managerlist: 'accounts/managerprofiles/'
 }
 
 
@@ -225,6 +226,11 @@ export const InspectionAPI = {
     //for fetching messages
     fetchMessages: (page, id) => UserAxios.get(`${BASE_URL}/${endPoints.fetchmessages}`,{
         params:{ page: page, selectedUser: id}
+    }).then(responseBody),
+
+    //get list of managers
+    getManagersList: (id) =>  UserAxios.get(`${BASE_URL}/${endPoints.managerlist}`,{
+        params:{ entity: id}
     }).then(responseBody),
 
 

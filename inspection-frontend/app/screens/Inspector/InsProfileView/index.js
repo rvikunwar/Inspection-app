@@ -1,28 +1,22 @@
 import {
-    CardReport02,
-    CardReport04,
     Header,
     SafeAreaView,
     Tag,
     Text,
     ProfileAuthor,
-    ListTextButton,
     Icon,
     Button,
     PieChart,
     TextInput
 } from "@components";
-import { BaseColor, BaseStyle, useTheme, Images } from "@config";
+import { BaseColor, BaseStyle, useTheme } from "@config";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import React, { useEffect, useState, useRef } from "react";
-import { useTranslation } from "react-i18next";
 import { 
     ScrollView, 
     View, 
     Animated, 
-    I18nManager, 
     StyleSheet,
-    FlatList,
     TouchableOpacity
 } from "react-native";
 import styles from "./styles";
@@ -33,7 +27,8 @@ import { parseHexTransparency } from "@utils";
 import { logger } from "react-native-logs";
 import { Loader } from '@container'
 import { haveChildren } from "@utils";
-
+import * as Linking from "expo-linking";
+import { COUNTRY_CODE } from '@env'
 
 
 const InsProfileView = () => {
@@ -317,7 +312,11 @@ const InsProfileView = () => {
                                 description={`(${item?.name})`}/>
                             
                             <View style={{flexDirection: "row"}}>
-                                <View style={[styles.header]}>
+                                <TouchableOpacity 
+                                    onPress={()=>{
+                                        Linking.openURL(`mailto:${inspector?.email}`)
+                                    }}
+                                    style={[styles.header]}>
                                     <View
                                         style={[
                                             styles.viewIcon,
@@ -342,9 +341,13 @@ const InsProfileView = () => {
                                         <Text>Email: </Text>
                                         <Text footnote>{inspector?.email}</Text>
                                     </View>
-                                </View>
+                                </TouchableOpacity>
 
-                                <View style={[styles.header, {marginLeft: 20}]}>
+                                <TouchableOpacity
+                                    onPress={()=>{
+                                        Linking.openURL(`tel:${COUNTRY_CODE} ${inspector?.phone_number}`);
+
+                                    }} style={[styles.header, {marginLeft: 20}]}>
                                     <View
                                         style={[
                                             styles.viewIcon,
@@ -369,7 +372,7 @@ const InsProfileView = () => {
                                         <Text>Phone number: </Text>
                                         <Text footnote>{inspector?.phone_number}</Text>
                                     </View>
-                                </View>
+                                </TouchableOpacity>
                             </View>
                             </>:
                             <View style={{height:30, width:70,paddingTop:4}}>

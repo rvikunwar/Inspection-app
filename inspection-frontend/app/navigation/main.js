@@ -19,7 +19,7 @@ import Setting from '@screens/Settings'
 import ThemeSetting from '@screens/Settings/ThemeSetting'
 import FontOption from '@screens/Settings/FontOption'
 import SelectDarkOption from '@screens/Settings/SelectDarkTheme'
-
+import  Managers from '@screens/Inspector/Managers'
 
 export const InspectorMainScreens = {
 
@@ -27,6 +27,14 @@ export const InspectorMainScreens = {
         component: EntityView,
         options: {
             title: "Entity view",
+            headerShown:false,
+        },   
+    },
+
+    Managers:{
+        component: Managers,
+        options: {
+            title: "Managers",
             headerShown:false,
         },   
     },

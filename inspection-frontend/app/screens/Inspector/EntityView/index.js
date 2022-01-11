@@ -5,7 +5,8 @@ import {
     ProfileAuthor,
     Icon,
     PieChart,
-    TextInput
+    TextInput,
+    Button
 } from "@components";
 import { BaseColor, BaseStyle, useTheme } from "@config";
 import React, { useEffect, useState, useRef } from "react";
@@ -22,7 +23,8 @@ import LoadingDots from "react-native-loading-dots";
 import { InspectionAPI } from "@connect/api";
 import { parseHexTransparency } from "@utils";
 import Area from "./Area";
-
+import * as Linking from "expo-linking";
+import { COUNTRY_CODE } from '@env'
 
 
 const EntityView = (props) => {
@@ -241,7 +243,10 @@ const EntityView = (props) => {
                                 description={"(Head of department)"}
                             />
 
-                            <View
+                            <TouchableOpacity
+                                onPress={()=>{
+                                    Linking.openURL(`mailto:${member?.email}`)
+                                }}
                                 style={[
                                     {   flexDirection:"row",
                                     
@@ -279,7 +284,7 @@ const EntityView = (props) => {
                                 </Text>
 
                             
-                            </View>
+                            </TouchableOpacity>
 
                             <TouchableOpacity style={[
                                         
@@ -294,12 +299,36 @@ const EntityView = (props) => {
                                             right: 10
                                     }]} 
                                     onPress={()=>{
-                                        navigation.navigate("Messages",{ selectedUser: member.user });
+                                        navigation.navigate("Messages",{ selectedUser: member });
                                         }}>
                                     <Icon name="facebook-messenger" size={20} solid style={{color: colors.primary }}/>    
                                 </TouchableOpacity> 
 
-                            <View
+                                <TouchableOpacity style={[
+                                        {
+                                            position:"absolute",
+                                            bottom:10,
+                                            right: 60,
+                                    }]}>
+                                    <Button
+                                        styleText={{
+                                            fontSize:13
+                                        }}
+                                        onPress={()=>{
+                                            navigation.navigate("Managers",{ entity:entity.id });
+                                            }}
+                                        style={{
+                                            maxHeight:35,
+                                            maxWidth:120,
+                                            paddingHorizontal:10
+                                        }}>
+                                        Managers
+                                    </Button> 
+                                </TouchableOpacity> 
+                            <TouchableOpacity
+                                onPress={()=>{
+                                    Linking.openURL(`tel:${COUNTRY_CODE} ${member?.phone_number}`);
+                                }}
                                 style={[
                                     {   flexDirection:"row",
                                         alignItems:"center",
@@ -328,14 +357,14 @@ const EntityView = (props) => {
                                         />
                                     </View>
                                 </View>
-
+                                
                                 <Text subhead light >
                                     {"phone number:"}
                                 </Text>
                                 <Text subhead style={{ marginLeft: 5, }}>
                                     {`${member?.phone_number}`}
                                 </Text>
-                            </View>
+                            </TouchableOpacity>
                             
                          
                             </>:

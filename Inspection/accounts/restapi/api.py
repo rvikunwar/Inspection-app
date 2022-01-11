@@ -46,13 +46,13 @@ class MemberProfileDetails(APIView):
 
 class GetUserPersonalDetails(APIView):
     def get(self, request):
-        user = request.query_params.get('id')
         user = User.objects.get(id=user)
         profiles = Profile.objects.get(user=user)
         serializer = ProfileSerializerv1(profiles)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+        user = request.query_params.get('id')
 class AddExpoToken(APIView):
     def post(self, request):
         user = request.user.id
@@ -114,3 +114,15 @@ class ChangePasswordView(generics.UpdateAPIView):
 
             return Response(response)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ManagerProfiles(APIView):
+    def get(self, request):
+        entity = request.query_params.get('entity', None)
+        if entity is not None:
+            profiles = Profile.objects.filter(entity=entity, position='MANAGER')
+            serializer = ManagerProfileSerializer(profiles, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response('Not allowed', status=status.HTTP_200_OK)
+
+

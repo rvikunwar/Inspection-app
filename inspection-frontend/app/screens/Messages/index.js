@@ -10,12 +10,10 @@ import {
 import {BaseStyle, Images, useTheme} from '@config';
 import {Header, SafeAreaView, Icon, Image, Text, TextInput} from '@components';
 import styles from './styles';
-import {useTranslation} from 'react-i18next';
 import WebSocketInstance from '@socket/websocket';
 import { useSelector, useDispatch } from 'react-redux';
 import { sendMessageHandler, updateMessageSeenStatus } from '@socket/socketfunc'
 import { renderTimestamp } from './commonfunc';
-import Camera from './camera';
 import { InspectionAPI } from '@connect/api';
 import Procfile from '@assets/images/procfile.jpg'
 import { HOST_URL } from '@env'
@@ -184,7 +182,9 @@ export default function Messages({route, navigation}) {
     }
     
     function initialiseChat() {
-        waitForSocketConnection();
+        waitForSocketConnection(()=>{
+            WebSocketInstance.updateUnseen(selectedUser.user)
+        });
         WebSocketInstance.connect(roomname);
     }
 

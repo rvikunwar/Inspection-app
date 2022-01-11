@@ -10,5 +10,5 @@ urlpatterns = [
     path('removeExpoToken/', RemoveExpoToken.as_view(), name="remove-expo-token"),
     path('updateUserProfile/<int:pk>/', UserProfileAPI.as_view(), name="user-profile"),
     path('change-password/', ChangePasswordView.as_view(), name='change-password'),
-
+    path('managerprofiles/', ManagerProfiles.as_view(), name="manager-list")
 ]

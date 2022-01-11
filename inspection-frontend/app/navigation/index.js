@@ -18,7 +18,7 @@ import ResetPassword from '@screens/ResetPassword'
 import { InspectorMainScreens, CommonMainScreens, MangerMainScreens } from "./main";
 import { setOnlineStatus, getMNCount, updateCoordinates } from '@socket/socketfunc'
 import { NotificationActions } from "@actions";
-import { managerScreen, inspectorScreen } from "./config/project";
+import { managerScreen, inspectorScreen  } from "./config/project";
 import { GlobalWebSocketInstance } from '@socket/NotificationSocket'
 import { store } from 'app/store'
 import FlashMessage from "react-native-flash-message";
@@ -60,8 +60,7 @@ const MainScreens = () => {
                             options={options}
                         />
                     );
-                })
-                
+                })    
             }
 
             

@@ -25,7 +25,8 @@ import { HOST_URL } from "@env"
 import LoadingDots from "react-native-loading-dots";
 import { InspectionAPI } from "@connect/api";
 import { parseHexTransparency } from "@utils";
-
+import * as Linking from "expo-linking";
+import { COUNTRY_CODE } from '@env'
 
 const InsProfileView = () => {
     const { t } = useTranslation();
@@ -288,7 +289,11 @@ const InsProfileView = () => {
                             />
                             
                             <View style={{flexDirection: "row"}}>
-                                <View style={[styles.header]}>
+                                <TouchableOpacity 
+                                    onPress={()=>{
+                                        Linking.openURL(`mailto:${inspector?.email}`)
+                                    }}
+                                    style={[styles.header]}>
                                     <View
                                         style={[
                                             styles.viewIcon,
@@ -313,9 +318,13 @@ const InsProfileView = () => {
                                         <Text>Email: </Text>
                                         <Text>{inspector?.email}</Text>
                                     </View>
-                                </View>
+                                </TouchableOpacity>
 
-                                <View style={[styles.header, {marginLeft: 20}]}>
+                                <TouchableOpacity
+                                    onPress={()=>{
+                                        Linking.openURL(`tel:${COUNTRY_CODE} ${inspector?.phone_number}`);
+
+                                    }}  style={[styles.header, {marginLeft: 20}]}>
                                     <View
                                         style={[
                                             styles.viewIcon,
@@ -340,7 +349,7 @@ const InsProfileView = () => {
                                         <Text>Phone number: </Text>
                                         <Text>{inspector?.phone_number}</Text>
                                     </View>
-                                </View>
+                                </TouchableOpacity>
                             </View>
                             </>:
                             <View style={{height:30, width:70,paddingTop:4}}>

@@ -1,12 +1,10 @@
 import { 
     Icon, 
-    Image, 
-    TextInput, 
     Text, 
     ProfileAuthor ,
     Button
 } from "@components";
-import { Images, BaseColor, useTheme } from "@config";
+import { useTheme } from "@config";
 import React, { useState, useEffect } from "react";
 import { TouchableOpacity, View } from "react-native";
 import styles from "./styles";
@@ -16,16 +14,8 @@ import { HOST_URL } from "@env"
 import { parseHexTransparency } from "@utils";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
-
-const imagesInit = [
-    { id: "1", image: Images.location1, selected: true },
-    { id: "2", image: Images.location2 },
-    { id: "3", image: Images.location3 },
-    { id: "4", image: Images.location4 },
-    { id: "5", image: Images.location5 },
-    { id: "6", image: Images.location6 },
-    { id: "7", image: Images.location7 },
-];
+import * as Linking from "expo-linking";
+import { COUNTRY_CODE } from '@env'
 
 
 const MapMarkerView = ({ item, setSelectedProfile, setOpen }) => {
@@ -120,7 +110,10 @@ const ProfileCardView = ({ inspector, area, department }) => {
 
                             
                 <View style={{flexDirection: "row", flex:1}}>
-                    <View style={[styles.header]}>
+                        <TouchableOpacity
+                            onPress={()=>{
+                                Linking.openURL(`mailto:${inspector?.email}`)
+                            }} style={[styles.header]}>
                         <View
                             style={[
                                 styles.viewIcon,
@@ -145,9 +138,14 @@ const ProfileCardView = ({ inspector, area, department }) => {
                             <Text>Email: </Text>
                             <Text footnote>{inspector?.email}</Text>
                         </View>
-                    </View>
+                    </TouchableOpacity>
 
-                    <View style={[styles.header, {marginLeft: 20}]}>
+                   
+                    <TouchableOpacity
+                        onPress={()=>{
+                            Linking.openURL(`tel:${COUNTRY_CODE} ${inspector?.phone_number}`);
+
+                        }} style={[styles.header, {marginLeft: 20}]}>
                         <View
                             style={[
                                 styles.viewIcon,
@@ -172,7 +170,7 @@ const ProfileCardView = ({ inspector, area, department }) => {
                             <Text>Phone number: </Text>
                             <Text footnote>{inspector?.phone_number}</Text>
                         </View>
-                    </View>
+                    </TouchableOpacity>
                 </View>
             </View>
         </View>
@@ -181,48 +179,17 @@ const ProfileCardView = ({ inspector, area, department }) => {
 
 
 export default function PreviewMap({ navigation, route }) {
-    const imagesParam = route?.params?.images ?? imagesInit;
-    let flatListRef = null;
-    let swiperRef = null;
 
-    const [images, setImages] = useState(imagesParam);
-    const [indexSelected, setIndexSelected] = useState(0);
     const [ selectedProfile, setSelectedProfile ] = useState()
     const [ open, setOpen ] = useState(false)
 
     const latitude = useSelector(state =>   state.auth.user.latitude)
     const longitude = useSelector(state =>   state.auth.user.longitude)
 
-    const onSelect = (indexSelected) => {
-        setIndexSelected(indexSelected);
-        setImages(
-            images.map((item, index) => {
-                if (index == indexSelected) {
-                    return {
-                    ...item,
-                    selected: true,
-                    };
-                } else {
-                    return {
-                    ...item,
-                    selected: false,
-                    };
-                }
-            })
-        );
-        flatListRef.scrollToIndex({
-            animated: true,
-            index: indexSelected,
-        });
-    };
 
     /**
      * @description Called when image item is selected or activated
      */
-    const onTouchImage = (touched) => {
-        if (touched == indexSelected) return;
-        swiperRef.scrollBy(touched - indexSelected, false);
-    };
 
     const area = route?.params?.area
     const inspectors =  route?.params?.users || []

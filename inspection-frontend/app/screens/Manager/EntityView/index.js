@@ -18,13 +18,10 @@ import { useTranslation } from "react-i18next";
 import { 
     ScrollView, 
     View, 
-    Animated, 
-    I18nManager, 
+    Animated,  
     StyleSheet,
-    FlatList,
     TouchableOpacity,
-    KeyboardAvoidingView,
-    Touchable
+    Touchable,
 } from "react-native";
 import styles from "./styles";
 import { HOST_URL } from "@env"
@@ -33,6 +30,9 @@ import { InspectionAPI } from "@connect/api";
 import { useSelector } from "react-redux";
 import { haveChildren } from "@utils";
 import { parseHexTransparency } from "@utils";
+import * as Linking from "expo-linking";
+import { COUNTRY_CODE } from '@env'
+
 
 
 const EntityView = () => {
@@ -292,7 +292,11 @@ const EntityView = () => {
                             />
                             
                             <View style={{flexDirection: "row",}}>
-                                <View style={[styles.header]}>
+                                <TouchableOpacity 
+                                    onPress={()=>{
+                                        Linking.openURL(`mailto:${member?.email}`)
+                                    }}
+                                    style={[styles.header]}>
                                     <View
                                         style={[
                                             styles.viewIcon,
@@ -317,9 +321,13 @@ const EntityView = () => {
                                         <Text>Email: </Text>
                                         <Text footnote>{member?.email}</Text>
                                     </View>
-                                </View>
+                                </TouchableOpacity>
 
-                                <View style={[styles.header, {marginLeft: 50}]}>
+                                <TouchableOpacity 
+                                    onPress={()=>{
+                                        Linking.openURL(`tel:${COUNTRY_CODE} ${member?.phone_number}`);
+                                    }}
+                                    style={[styles.header, {marginLeft: 50}]}>
                                     <View
                                         style={[
                                             styles.viewIcon,
@@ -344,7 +352,7 @@ const EntityView = () => {
                                         <Text>Phone number: </Text>
                                         <Text footnote>{member?.phone_number}</Text>
                                     </View>
-                                </View>
+                                </TouchableOpacity>
                             </View>
                             </>:
                             <View style={{height:30, width:70,paddingTop:4}}>
@@ -391,7 +399,11 @@ const EntityView = () => {
                     <View style={{
                         flexDirection: "row", 
                         alignItems:"center", width:"70%"}}>
-                                <View style={[styles.header,{width:"60%",paddingRight:28}]}>
+                                <TouchableOpacity 
+                                    onPress={()=>{
+                                        Linking.openURL(`mailto:${itemv1?.email}`)
+                                    }}
+                                    style={[styles.header,{width:"60%",paddingRight:28}]}>
                                     <View
                                         style={[
                                             styles.viewIcon,
@@ -414,11 +426,15 @@ const EntityView = () => {
 
                                     <View>
                                         <Text>Email: </Text>
-                                        <Text footnote>{member?.email}</Text>
+                                        <Text footnote>{itemv1?.email}</Text>
                                     </View>
-                                </View>
+                                </TouchableOpacity>
 
-                                <View style={[styles.header, {marginLeft: 0 ,width:"40%"}]}>
+                                <TouchableOpacity 
+                                    onPress={()=>{
+                                        Linking.openURL(`tel:${COUNTRY_CODE} ${itemv1?.phone_number}`);
+                                    }}
+                                    style={[styles.header, {marginLeft: 0 ,width:"40%"}]}>
                                     <View
                                         style={[
                                             styles.viewIcon,
@@ -441,10 +457,10 @@ const EntityView = () => {
 
                                     <View>
                                         <Text>Phone number: </Text>
-                                        <Text footnote>{member?.phone_number}</Text>
+                                        <Text footnote>{itemv1?.phone_number}</Text>
                                     </View>
-                                </View>
-                                </View>
+                                </TouchableOpacity>
+                            </View>
 
                     </View>
 

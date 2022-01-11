@@ -56,9 +56,24 @@ class ChatConsumer(WebsocketConsumer):
         }
         return self.send_chat_message(content)
 
+    def update_un_seen(self, data):
+        user = self.scope['user']
+        selectedUser = data['selectedUser']
+        print(data, selectedUser)
+        try:
+            messages = (MemberMessages.objects.filter(sender=user, reciever=selectedUser, is_seen=False) |
+                MemberMessages.objects.filter(sender=selectedUser, reciever=user, is_seen=False))
+            messages.update(is_seen=True)
+            print('Un seen messages update successfull')
+        except Exception as e:
+            print(e)
+            print('something went wrong while updating un seen messages')
+
+
     commands = {
         'fetch_messages': fetch_message,
         'new_message': new_message,
+        'update_un_seen': update_un_seen
     }
 
     def connect(self):

@@ -74,6 +74,13 @@ export class WebSocketService {
         });
     }
 
+    updateUnseen(selectedUser){
+        this.sendMessage({
+            command: "update_un_seen",
+            selectedUser
+        });
+    }
+
     addCallbacks({ addMessagesfunc }) {
 
         if(typeof addMessagesfunc === "function"){
